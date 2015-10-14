@@ -18,6 +18,7 @@ class AddPlayerHandler(webapp2.RequestHandler):
 
   def post(self):
     name = self.request.get("name")
+    email = self.request.get("email")
     if not name:
       self.response.out.write("Error: must supply a name")
       return
@@ -25,7 +26,7 @@ class AddPlayerHandler(webapp2.RequestHandler):
       self.response.out.write("A player with that name already exists")
       return
 
-    player = Player(name=name)
+    player = Player(name=name, email=email)
     player.put()
 
     self.response.out.write("Successfully added " + name)
