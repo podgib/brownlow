@@ -76,10 +76,31 @@ class GenerateTokenHandler(webapp2.RequestHandler):
     token.put()
     self.response.out.write(token.value)
 
+class EmailHandler(webapp2.RequestHandler):
+  def get(self, game_id=None):
+    if not game_id:
+      template = jinja_environment.get_template("templates/game_list.html")
+      games = Game.all().run()
+      self.response.out.write(template.render({'games':games}))
+      return
 
+    game = Game.get_by_id(int(game_id))
+    if not game:
+      self.response.out.write("Error: invalid game ID")
+      return
+
+    players = Player.all().fetch(100)
+    playing = [p for p in players if p.key() in game.players]
+    not_playing = [p for p in players if p.key() not in game.players]
+
+    template = jinja_environment.get_template("templates/send_emails.html")
+    args = {'playing':playing,'not_playing':not_playing,'game':game}
+    self.response.out.write(template.render(args))
 
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
   webapp2.Route('/admin/add_game', handler=AddGameHandler),
-  webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler)
+  webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler),
+  webapp2.Route('/admin/send_emails', handler=EmailHandler),
+  webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler)
 ], debug=True)

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OUARFC Voting</title>
+</head>
+<body>
+<h1>Send Voting Emails</h1>
+<h2>Oxford vs {{game.opponent}}</h2>
+<h3>{{game.venue}}, {{game.date}}</h3>
+{% if errmsg -%}
+<p>Error: {{errmsg}}</p>
+{%- endif %}
+<p>Please confirm who played:</p>
+<form method="POST" action="/admin/add_game">
+    {% for p in playing %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}" checked>
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    {% for p in not_playing %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    <input type="submit" name="send" value="Send">
+</form>
+
+</body>
+</html>

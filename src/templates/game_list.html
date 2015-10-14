@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OUARFC Vote</title>
+</head>
+<body>
+<h1>Send Emails</h1>
+<h2>Select Game</h2>
+<ul>
+    {% for g in games -%}
+    <li><a href="/admin/send_emails/{{g.key().id()}}">Oxford vs {{g.opponent}}, {{g.date}}</a></li>
+    {%- endfor %}
+</ul>
+
+</body>
+</html>
