@@ -3,9 +3,12 @@ import os
 import jinja2
 import logging
 
+from google.appengine.ext import db
+
 from models.game import Game
 from models.player import Player
 from models.vote import Vote
+from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -13,9 +16,16 @@ ERROR_DUPLICATE_VOTE = 1280
 ERROR_VOTE_FOR_SELF = 1281
 
 class VoteHandler(webapp2.RequestHandler):
-  def get(self, token):
-    # TODO: get this from token
-    game = Game.all().get()
+  def get(self, token_string):
+    token = Token.all().filter("value =", token_string).get()
+    if not token:
+      self.response.out.write("Error: invalid voting token")
+      return
+    if token.used:
+      self.response.out.write("Error: you've already voted!")
+      return
+
+    game = token.game
     players = Player.get(game.players)
 
     errmsg = None
@@ -24,32 +34,47 @@ class VoteHandler(webapp2.RequestHandler):
     elif self.request.get("err") == str(ERROR_VOTE_FOR_SELF):
       errmsg = "You can't vote for yourself!"
 
-    args = {'game':game, 'players':players, 'token':token, 'errmsg':errmsg}
+    args = {'game':game, 'players':players, 'token':token.value, 'errmsg':errmsg}
     template = jinja_environment.get_template("templates/vote.html")
     self.response.out.write(template.render(args))
 
-  def post(self):
-    # TODO: get this from token
-    game = Game.all().get()
-    voter = Player.all().get()
+  def save_vote(self, vote, token):
+    vote.put()
+    token.put()
 
-    token = self.request.get("token")
+  def post(self):
+    token_string = self.request.get("token")
+    logging.info(token_string)
+    token = Token.all().filter("value =", token_string).get()
+    if not token:
+      self.response.out.write("Error: invalid voting token")
+      return
+    if token.used:
+      self.response.out.write("Error: you've already voted!")
+      return
+
+    game = token.game
+    voter = token.voter
+
     three = self.request.get("three")
     two = self.request.get("two")
     one = self.request.get("one")
 
     if one in [two, three] or two == three:
-      return self.redirect("/vote/" + token + "?err=" + str(ERROR_DUPLICATE_VOTE))
+      return self.redirect("/vote/" + token.value + "?err=" + str(ERROR_DUPLICATE_VOTE))
 
     if str(voter.key().id()) in [one, two, three]:
-      return self.redirect("/vote/" + token + "?err=" + str(ERROR_VOTE_FOR_SELF))
+      return self.redirect("/vote/" + token.value + "?err=" + str(ERROR_VOTE_FOR_SELF))
 
     three_player = Player.get_by_id(int(three))
     two_player = Player.get_by_id(int(two))
     one_player = Player.get_by_id(int(one))
 
     vote = Vote(game=game, three=three_player, two=two_player, one=one_player)
+    token.used = True
+
     vote.put()
+    token.put()
 
     self.response.out.write("Vote submitted")
 
@@ -58,6 +83,6 @@ class SubmitHandler(webapp2.RequestHandler):
     self.response.out.write("Submitted")
 
 app = webapp2.WSGIApplication([
-    webapp2.Route('/vote/<token>', handler=VoteHandler),
+    webapp2.Route('/vote/<token_string>', handler=VoteHandler),
     webapp2.Route('/vote', handler=VoteHandler),
 ], debug=True)

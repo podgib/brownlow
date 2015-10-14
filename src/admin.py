@@ -1,3 +1,4 @@
+import base64
 import webapp2
 import os
 import jinja2
@@ -6,6 +7,7 @@ import datetime
 
 from models.player import Player
 from models.game import Game
+from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -53,8 +55,30 @@ class AddGameHandler(webapp2.RequestHandler):
 
     self.response.out.write("Successfully added game")
 
+class GenerateTokenHandler(webapp2.RequestHandler):
+  def get(self):
+    template = jinja_environment.get_template("templates/generate_token.html")
+    games = Game.all().run()
+    players = Player.all().run()
+    args = {'games':games,'players':players}
+    self.response.out.write(template.render(args))
+
+  def post(self):
+    game_id = self.request.get("game")
+    voter_id = self.request.get("player")
+
+    voter = Player.get_by_id(int(voter_id))
+    game = Game.get_by_id(int(game_id))
+
+    value = base64.urlsafe_b64encode(os.urandom(32))
+    token = Token(value=value, voter=voter, game=game, used=False)
+    token.put()
+    self.response.out.write(token.value)
+
+
 
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
-  webapp2.Route('/admin/add_game', handler=AddGameHandler)
+  webapp2.Route('/admin/add_game', handler=AddGameHandler),
+  webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler)
 ], debug=True)
