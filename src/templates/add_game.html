@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OUARFC Voting</title>
+</head>
+<body>
+<h1>Add a game</h1>
+<form method="POST" action="/admin/add_game">
+    <label for="opponent">Opponent: </label><input type="text" name="opponent" id="opponent" placeholder="Cambridge">
+    <label for="date">Date: </label><input type="date" name="date" id="date" placeholder="7/3/2016">
+    <label for="venue">Venue: </label><input type="text" name="venue" id="venue" placeholder="Oxford">
+    <br>
+    {% for p in players %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    <input type="submit" name="add" value="Add">
+</form>
+
+</body>
+</html>
