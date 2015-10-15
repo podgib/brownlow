@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>OUARFC Vote</title>
-</head>
-<body>
+{% extends 'templates/layout.html' %}
+
+{% block content %}
 <h1>Generate Voting Token</h1>
 <form method="POST" action="/admin/generate_token" >
     <label for="player">Player:</label><br>
@@ -22,5 +18,4 @@
     <input type="submit" name="generate" value="Generate">
 </form>
 
-</body>
-</html>
+{% endblock %}

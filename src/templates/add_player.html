@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>OUARFC Voting</title>
-</head>
-<body>
+{% extends 'templates/layout.html' %}
+
+{% block content %}
 <h1>Add a player</h1>
 <form method="POST" action="/admin/add_player">
     <label for="name">Name: </label><input type="text" name="name" id="name" placeholder="Wande McCunn"><br>
     <label for="email">Email: </label><input type="email" name="email" id="email" placeholder="someone@example.com"><br>
     <input type="submit" name="add" value="Add"><br>
 </form>
-</body>
-</html>
+{% endblock content %}

@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>OUARFC Voting</title>
-</head>
-<body>
+{% extends 'templates/layout.html' %}
+
+{% block content %}
 <h1>Send Voting Emails</h1>
 <h2>Oxford vs {{game.opponent}}</h2>
 <h3>{{game.venue}}, {{game.date}}</h3>
@@ -27,5 +23,4 @@
     <input type="submit" name="send" value="Send">
 </form>
 
-</body>
-</html>
+{% endblock %}

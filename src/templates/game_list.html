@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>OUARFC Vote</title>
-</head>
-<body>
+{% extends 'templates/layout.html' %}
+
+{% block content %}
 <h1>Send Emails</h1>
 <h2>Select Game</h2>
 <ul>
@@ -13,5 +9,4 @@
     {%- endfor %}
 </ul>
 
-</body>
-</html>
+{% endblock content %}
