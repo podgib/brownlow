@@ -38,10 +38,6 @@ class VoteHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/vote.html")
     self.response.out.write(template.render(args))
 
-  def save_vote(self, vote, token):
-    vote.put()
-    token.put()
-
   def post(self):
     token_string = self.request.get("token")
     logging.info(token_string)
@@ -76,7 +72,8 @@ class VoteHandler(webapp2.RequestHandler):
     vote.put()
     token.put()
 
-    self.response.out.write("Vote submitted")
+    template = jinja_environment.get_template('templates/success.html')
+    self.response.out.write(template.render({}))
 
 class SubmitHandler(webapp2.RequestHandler):
   def post(self):

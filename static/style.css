@@ -1,4 +1,45 @@
 body {
     background: #022B5E;
     color: white;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+h1 {
+    margin-bottom: 0.5em;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+h2 {
+    font-style: italic;
+    font-weight: normal;
+    font-size: 1.2em;
+}
+
+h3 {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+input {
+    margin-bottom: 0.5em;
+}
+
+select {
+    margin-bottom: 1em;
+}
+
+input[type="submit"] {
+    font-size: 1.2em;
+    margin-top: 0.5em;
+}
+
+p.error {
+    background: red;
+    border: 1px solid white;
+    padding: 1em;
+}
+
+a, a:visited {
+    color: white;
 }

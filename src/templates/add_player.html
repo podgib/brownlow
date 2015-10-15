@@ -3,8 +3,10 @@
 {% block content %}
 <h1>Add a player</h1>
 <form method="POST" action="/admin/add_player">
-    <label for="name">Name: </label><input type="text" name="name" id="name" placeholder="Wande McCunn"><br>
-    <label for="email">Email: </label><input type="email" name="email" id="email" placeholder="someone@example.com"><br>
+    <label for="name">Name: </label><br>
+    <input type="text" name="name" id="name" placeholder="Wande McCunn"><br>
+    <label for="email">Email: </label><br>
+    <input type="email" name="email" id="email" placeholder="someone@example.com"><br>
     <input type="submit" name="add" value="Add"><br>
 </form>
 {% endblock content %}

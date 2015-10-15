@@ -5,7 +5,7 @@
 <h2>Oxford vs {{game.opponent}}</h2>
 <h3>{{game.venue}}, {{game.date}}</h3>
 {% if errmsg -%}
-<p>Error: {{errmsg}}</p>
+<p class="error">Error: {{errmsg}}</p>
 {%- endif %}
 <p>Please confirm who played:</p>
 <form method="POST" action="/admin/send_emails">

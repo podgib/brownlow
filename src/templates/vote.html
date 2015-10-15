@@ -4,7 +4,7 @@
 <h1>Oxford vs {{game.opponent}}</h1>
 <h2>{{game.venue}}, {{game.date}}</h2>
 {% if errmsg -%}
-    <p>Error: {{errmsg}}</p>
+    <p class="error">Error: {{errmsg}}</p>
 {%- endif %}
 <form method="POST" action="/vote" >
     <label for="three">3 Votes (best on ground):</label><br>
