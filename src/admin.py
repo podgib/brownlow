@@ -5,6 +5,8 @@ import jinja2
 import logging
 import datetime
 
+from google.appengine.api import taskqueue
+
 from models.player import Player
 from models.game import Game
 from models.token import Token
@@ -87,6 +89,7 @@ class EmailHandler(webapp2.RequestHandler):
     game = Game.get_by_id(int(game_id))
     if not game:
       self.response.out.write("Error: invalid game ID")
+      logging.error("Invalid game ID: " + str(game_id))
       return
 
     players = Player.all().fetch(100)
@@ -96,6 +99,26 @@ class EmailHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/send_emails.html")
     args = {'playing':playing,'not_playing':not_playing,'game':game}
     self.response.out.write(template.render(args))
+
+  def post(self):
+    game_id = self.request.get('game')
+    player_ids = self.request.get_all('players')
+
+    player_ids = [int(p) for p in player_ids]
+    game = Game.get_by_id(int(game_id))
+    players = Player.get_by_id(player_ids)
+
+    player_keys = [p.key() for p in players]
+    game.players = player_keys
+    game.put()
+
+    params = {'player':0, 'game':game_id}
+    for p in players:
+      params['player'] = p.key().id()
+      taskqueue.add(url='/worker/email', params=params, queue_name='email', countdown=0)
+      logging.info('Submitted task to email' + p.email)
+
+    self.response.out.write('Emails queued. It may take some time for all emails to be sent')
 
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),

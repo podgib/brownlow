@@ -1,0 +1,13 @@
+Hi {{name}}
+
+It's time to submit your votes for the Oxford vs {{opponent}} game on {{date}}.
+
+Voting is quite simple - you just rank your three best players in order. The best gets 3 votes, second best 2 votes, and third best 1 vote.
+Note that you can not vote for yourself.
+
+To vote, please visit the following link:
+
+{{url}}
+
+Cheers
+The OUARFC Committee
