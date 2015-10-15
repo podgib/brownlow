@@ -120,10 +120,16 @@ class EmailHandler(webapp2.RequestHandler):
 
     self.response.out.write('Emails queued. It may take some time for all emails to be sent')
 
+class MenuHandler(webapp2.RequestHandler):
+  def get(self):
+    template = jinja_environment.get_template('templates/admin.html')
+    self.response.out.write(template.render({}))
+
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
   webapp2.Route('/admin/add_game', handler=AddGameHandler),
   webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler),
   webapp2.Route('/admin/send_emails', handler=EmailHandler),
-  webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler)
+  webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler),
+  ('/admin',MenuHandler), ('/admin/', MenuHandler)
 ], debug=True)

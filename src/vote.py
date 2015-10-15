@@ -75,11 +75,13 @@ class VoteHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/success.html')
     self.response.out.write(template.render({}))
 
-class SubmitHandler(webapp2.RequestHandler):
-  def post(self):
-    self.response.out.write("Submitted")
+class LandingHandler(webapp2.RequestHandler):
+  def get(self):
+    template = jinja_environment.get_template('templates/landing.html')
+    self.response.out.write(template.render({}))
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/vote/<token_string>', handler=VoteHandler),
     webapp2.Route('/vote', handler=VoteHandler),
+  ('/', LandingHandler)
 ], debug=True)
