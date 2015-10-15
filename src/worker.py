@@ -26,7 +26,7 @@ class EmailHandler(webapp2.RequestHandler):
     token = Token(value=token_string, voter=player, game=game, used=False)
     token.put()
 
-    url = "http://ouarfc-vote.appspot.com/vote/" + token_string
+    url = "http://vote.ouarfc.co.uk/vote/" + token_string
 
     template = jinja_environment.get_template('templates/email.txt')
     subject = "OUARFC: Please Vote For Best & Fairest"
