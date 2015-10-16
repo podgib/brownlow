@@ -3,9 +3,18 @@
 {% block content %}
 <h1>Add a game</h1>
 <form method="POST" action="/admin/add_game">
-    <label for="opponent">Opponent: </label><input type="text" name="opponent" id="opponent" placeholder="Cambridge">
-    <label for="date">Date: </label><input type="date" name="date" id="date" placeholder="7/3/2016">
-    <label for="venue">Venue: </label><input type="text" name="venue" id="venue" placeholder="Oxford">
+    <label for="opponent">Opponent: </label><br>
+    <input type="text" name="opponent" id="opponent" placeholder="Cambridge"><br>
+    <label for="date">Date: </label><br>
+    <input type="date" name="date" id="date" placeholder="7/3/2016"><br>
+    <label for="venue">Venue: </label><br>
+    <input type="text" name="venue" id="venue" placeholder="Oxford"><br>
+    <label for="team">Team: </label><br>
+    <select name="team" id="team">
+        {% for t in teams -%}
+        <option value="{{t}}">{{t}}</option>
+        {%- endfor %}
+    </select>
     <br>
     {% for p in players %}
     <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">

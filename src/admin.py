@@ -9,6 +9,7 @@ from google.appengine.api import taskqueue
 
 from models.player import Player
 from models.game import Game
+from models.game import Team
 from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -37,7 +38,8 @@ class AddGameHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template("templates/add_game.html")
     players = Player.all().run()
-    args = {'players':players}
+    teams = Team.getAll()
+    args = {'players':players, 'teams':teams}
     self.response.out.write(template.render(args))
 
   def post(self):
@@ -45,11 +47,12 @@ class AddGameHandler(webapp2.RequestHandler):
     date_string = self.request.get("date")
     venue = self.request.get("venue")
     player_id_strings = self.request.get_all("players")
+    team = Team.getTeam(self.request.get("team"))
 
     date_tokens = date_string.split("/")
     date = datetime.date(int(date_tokens[2]), int(date_tokens[1]), int(date_tokens[0]))
 
-    game = Game(opponent=opponent, date=date, venue=venue)
+    game = Game(opponent=opponent, date=date, venue=venue, team=team)
     player_ids = [int(pid) for pid in player_id_strings]
     players = Player.get_by_id(player_ids)
     player_keys = [p.key() for p in players]
