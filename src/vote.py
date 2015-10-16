@@ -27,6 +27,7 @@ class VoteHandler(webapp2.RequestHandler):
 
     game = token.game
     players = Player.get(game.players)
+    players.sort(key=lambda p: p.name)
 
     errmsg = None
     if self.request.get("err") == str(ERROR_DUPLICATE_VOTE):

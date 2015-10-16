@@ -37,7 +37,7 @@ class AddPlayerHandler(webapp2.RequestHandler):
 class AddGameHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template("templates/add_game.html")
-    players = Player.all().run()
+    players = Player.all().order('name').run()
     teams = Team.getAll()
     args = {'players':players, 'teams':teams}
     self.response.out.write(template.render(args))
@@ -85,7 +85,7 @@ class EmailHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
     if not game_id:
       template = jinja_environment.get_template("templates/game_list.html")
-      games = Game.all().run()
+      games = Game.all().order('date').run()
       self.response.out.write(template.render({'games':games}))
       return
 
@@ -95,7 +95,7 @@ class EmailHandler(webapp2.RequestHandler):
       logging.error("Invalid game ID: " + str(game_id))
       return
 
-    players = Player.all().fetch(100)
+    players = Player.all().order('name').fetch(100)
     playing = [p for p in players if p.key() in game.players]
     not_playing = [p for p in players if p.key() not in game.players]
 
