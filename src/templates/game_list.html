@@ -5,7 +5,8 @@
 <h2>Select Game</h2>
 <ul>
     {% for g in games -%}
-    <li><a href="/admin/send_emails/{{g.key().id()}}">Oxford vs {{g.opponent}}, {{g.date}}</a></li>
+    <li><a href="/admin/send_emails/{{g.key().id()}}">Oxford vs {{g.opponent}},
+        {{g.date}} ({{g.team|teamString}})</a></li>
     {%- endfor %}
 </ul>
 

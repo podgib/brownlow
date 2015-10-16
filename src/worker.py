@@ -9,6 +9,7 @@ from google.appengine.api import mail
 
 from models.player import Player
 from models.game import Game
+from models.game import Team
 from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -32,7 +33,8 @@ class EmailHandler(webapp2.RequestHandler):
     subject = "OUARFC: Please Vote For Best & Fairest"
     message = mail.EmailMessage(sender="OUARFC <no-reply@ouarfc-vote.appspotmail.com>", subject=subject)
     message.to = player.email
-    message.body = template.render({'name':player.name, 'opponent':game.opponent, 'date':game.date, 'url':url})
+    message.body = template.render(
+      {'name':player.name, 'opponent':game.opponent, 'date':game.date, 'team': Team.getString(game.team), 'url':url})
     logging.info(message.body)
     logging.info("Sending email to " + player.email)
     message.send()

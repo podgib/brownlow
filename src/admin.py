@@ -13,6 +13,7 @@ from models.game import Team
 from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+jinja_environment.filters['teamString'] = Team.getString
 
 class AddPlayerHandler(webapp2.RequestHandler):
   def get(self):

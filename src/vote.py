@@ -5,12 +5,13 @@ import logging
 
 from google.appengine.ext import db
 
-from models.game import Game
+from models.game import Team
 from models.player import Player
 from models.vote import Vote
 from models.token import Token
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+jinja_environment.filters['teamString'] = Team.getString
 
 ERROR_DUPLICATE_VOTE = 1280
 ERROR_VOTE_FOR_SELF = 1281

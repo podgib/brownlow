@@ -1,7 +1,7 @@
 {% extends 'templates/layout.html' %}
 
 {% block content %}
-<h1>Oxford vs {{game.opponent}}</h1>
+<h1>Oxford vs {{game.opponent}} ({{game.team|teamString}})</h1>
 <h2>{{game.venue}}, {{game.date}}</h2>
 {% if errmsg -%}
     <p class="error">Error: {{errmsg}}</p>
