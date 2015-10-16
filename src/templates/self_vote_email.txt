@@ -1,0 +1,5 @@
+Hello
+
+{{name}} tried to award {{votes}} to {{pronoun}} for the game between Oxford and {{opponent}} on {{date}}.
+
+Shit bloke.

@@ -8,3 +8,7 @@ class Vote(db.Model):
   three = db.ReferenceProperty(Player, collection_name="three")
   two = db.ReferenceProperty(Player, collection_name="two")
   one = db.ReferenceProperty(Player, collection_name="one")
+
+class SelfVote(db.Model):
+  game = db.ReferenceProperty(Game, required=True)
+  voter = db.ReferenceProperty(Player)

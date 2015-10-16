@@ -1,9 +1,11 @@
+from google.appengine.api.taskqueue import taskqueue
 import webapp2
 import os
 import jinja2
 import logging
 
 from google.appengine.ext import db
+from google.appengine.api import mail
 
 from models.game import Team
 from models.player import Player
@@ -44,7 +46,6 @@ class VoteHandler(webapp2.RequestHandler):
 
   def post(self):
     token_string = self.request.get("token")
-    logging.info(token_string)
     token = Token.all().filter("value =", token_string).get()
     if not token:
       self.response.out.write("Error: invalid voting token")
@@ -79,6 +80,16 @@ class VoteHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/success.html')
     self.response.out.write(template.render({}))
 
+class SelfHandler(webapp2.RequestHandler):
+  def get(self, token_string):
+    logging.info("Received a self vote")
+    num_votes = self.request.get("votes")
+
+    params = {'token':token_string, 'votes':num_votes}
+    taskqueue.add(url='/worker/self_vote', params=params, queue_name='email', countdown=0)
+    self.response.out.write("Success!")
+
+
 class LandingHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template('templates/landing.html')
@@ -87,5 +98,6 @@ class LandingHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     webapp2.Route('/vote/<token_string>', handler=VoteHandler),
     webapp2.Route('/vote', handler=VoteHandler),
+    webapp2.Route('/vote/self/<token_string>', handler=SelfHandler),
   ('/', LandingHandler)
 ], debug=True)

@@ -31,21 +31,37 @@
 
 <script type="text/javascript">
   function checkVote() {
-      three = document.getElementById("three").value;
-      two = document.getElementById("two").value;
-      one = document.getElementById("one").value;
-      voter = "{{voter.key().id()}}";
-      name = "{{voter.name}}".split(" ")[0];
+      var three = document.getElementById("three").value;
+      var two = document.getElementById("two").value;
+      var one = document.getElementById("one").value;
+      var voter = "{{voter.key().id()}}";
+      var name = "{{voter.name}}".split(" ")[0];
 
+      if (three == voter || two == voter || one == voter) {
+          alert("Don't try to vote for yourself " + name + ". You sneaky bugger");
+          var num_votes;
+          if (three == voter) {
+              num_votes = "3";
+          } else if (two == voter) {
+              num_votes = "2";
+          } else {
+              num_votes = "1";
+          }
+          var xhttp;
+          if (window.XMLHttpRequest) {
+              xhttp = new XMLHttpRequest();
+          } else {
+              xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+          }
+          xhttp.open("GET", "/vote/self/{{token}}?votes=" + num_votes, true);
+          xhttp.send();
+          return false;
+      }
       if (three == two || three == one || two == one) {
           alert("You can't vote for the same person more than once");
           return false;
       }
-      if (three == voter || two == voter || one == voter) {
-          alert("Don't try to vote for yourself " + name + ". You sneaky bugger");
-          return false;
-      }
-      return false;
+      return true;
   }
 </script>
 
