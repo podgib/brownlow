@@ -26,7 +26,27 @@
         {%- endfor %}
     </select><br>
     <input type="hidden" name="token" value="{{token}}">
-    <input type="submit" name="submit" value="Submit">
+    <input type="submit" name="submit" value="Submit" onclick="return checkVote()">
 </form>
+
+<script type="text/javascript">
+  function checkVote() {
+      three = document.getElementById("three").value;
+      two = document.getElementById("two").value;
+      one = document.getElementById("one").value;
+      voter = "{{voter.key().id()}}";
+      name = "{{voter.name}}".split(" ")[0];
+
+      if (three == two || three == one || two == one) {
+          alert("You can't vote for the same person more than once");
+          return false;
+      }
+      if (three == voter || two == voter || one == voter) {
+          alert("Don't try to vote for yourself " + name + ". You sneaky bugger");
+          return false;
+      }
+      return false;
+  }
+</script>
 
 {% endblock %}

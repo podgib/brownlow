@@ -26,6 +26,8 @@ class VoteHandler(webapp2.RequestHandler):
       self.response.out.write("Error: you've already voted!")
       return
 
+    voter = token.voter;
+
     game = token.game
     players = Player.get(game.players)
     players.sort(key=lambda p: p.name)
@@ -36,7 +38,7 @@ class VoteHandler(webapp2.RequestHandler):
     elif self.request.get("err") == str(ERROR_VOTE_FOR_SELF):
       errmsg = "You can't vote for yourself!"
 
-    args = {'game':game, 'players':players, 'token':token.value, 'errmsg':errmsg}
+    args = {'game':game, 'players':players, 'token':token.value, 'errmsg':errmsg, 'voter':voter}
     template = jinja_environment.get_template("templates/vote.html")
     self.response.out.write(template.render(args))
 
