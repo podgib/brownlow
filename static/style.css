@@ -1,17 +1,17 @@
 html {
     margin-top: 0;
-    padding-top: 0;
     margin-bottom: 0;
     padding-bottom: 0;
     height: 100%;
-    background: #8cc2ce;
+    background: #E0DED9;
 }
 
 body {
     height: 100%;
-    max-width: 400px;
+    max-width: 480px;
     margin: 0 auto;
     background: #022B5E;
+    box-shadow: 0 0 10px 0px #000000;
 }
 
 h1 {
@@ -56,7 +56,6 @@ a, a:visited {
 }
 
 div#content {
-    max-width: 400px;
     margin: 0 auto;
     padding: 16px;
     background: #022B5E;
