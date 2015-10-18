@@ -22,10 +22,12 @@ class VoteHandler(webapp2.RequestHandler):
   def get(self, token_string):
     token = Token.all().filter("value =", token_string).get()
     if not token:
-      self.response.out.write("Error: invalid voting token")
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "invalid voting token"}))
       return
     if token.used:
-      self.response.out.write("Error: you've already voted!")
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "You've already voted!"}))
       return
 
     voter = token.voter;
@@ -48,10 +50,12 @@ class VoteHandler(webapp2.RequestHandler):
     token_string = self.request.get("token")
     token = Token.all().filter("value =", token_string).get()
     if not token:
-      self.response.out.write("Error: invalid voting token")
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "invalid voting token"}))
       return
     if token.used:
-      self.response.out.write("Error: you've already voted!")
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "You've already voted!"}))
       return
 
     game = token.game

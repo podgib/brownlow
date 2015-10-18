@@ -15,25 +15,40 @@ from models.token import Token
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 jinja_environment.filters['teamString'] = Team.getString
 
+ERROR_NO_NAME = 1280
+ERROR_ALREADY_EXISTS = 1281
+ERROR_NO_EMAIL = 1282
+
 class AddPlayerHandler(webapp2.RequestHandler):
   def get(self):
+    errmsg = None
+    if self.request.get("err") == str(ERROR_NO_NAME):
+      errmsg = "You didn't supply a name"
+    elif self.request.get("err") == str(ERROR_NO_EMAIL):
+      errmsg = "You didn't supply an email"
+    elif self.request.get("err") == str(ERROR_ALREADY_EXISTS):
+      errmsg = "A player with that name already exists"
     template = jinja_environment.get_template("templates/add_player.html")
-    self.response.out.write(template.render({}))
+    self.response.out.write(template.render({'errmsg':errmsg}))
 
   def post(self):
     name = self.request.get("name")
     email = self.request.get("email")
     if not name:
-      self.response.out.write("Error: must supply a name")
+      self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_NO_NAME))
+      return
+    if not email:
+      self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_NO_EMAIL))
       return
     if Player.all().filter("name =", name).count() > 0:
-      self.response.out.write("A player with that name already exists")
+      self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_ALREADY_EXISTS))
       return
 
     player = Player(name=name, email=email)
     player.put()
 
-    self.response.out.write("Successfully added " + name)
+    template = jinja_environment.get_template("templates/player_added.html")
+    self.response.out.write(template.render({'name':name}))
 
 class AddGameHandler(webapp2.RequestHandler):
   def get(self):
@@ -60,7 +75,8 @@ class AddGameHandler(webapp2.RequestHandler):
     game.players = player_keys
     game.put()
 
-    self.response.out.write("Successfully added game")
+    template = jinja_environment.get_template("templates/game_added.html")
+    self.response.out.write(template.render({}))
 
 class GenerateTokenHandler(webapp2.RequestHandler):
   def get(self):
@@ -80,7 +96,8 @@ class GenerateTokenHandler(webapp2.RequestHandler):
     value = base64.urlsafe_b64encode(os.urandom(32))
     token = Token(value=value, voter=voter, game=game, used=False)
     token.put()
-    self.response.out.write(token.value)
+    url = "http://vote.ouarfc.co.uk/vote/" + value
+    self.response.out.write(url)
 
 class EmailHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
@@ -122,7 +139,8 @@ class EmailHandler(webapp2.RequestHandler):
       taskqueue.add(url='/worker/email', params=params, queue_name='email', countdown=0)
       logging.info('Submitted task to email' + p.email)
 
-    self.response.out.write('Emails queued. It may take some time for all emails to be sent')
+    template = jinja_environment.get_template("templates/emails_sent.html")
+    self.response.out.write(template.render({}))
 
 class MenuHandler(webapp2.RequestHandler):
   def get(self):

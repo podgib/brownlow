@@ -40,7 +40,7 @@ class SelfVoteHandler(webapp2.RequestHandler):
 
     subject = "OUARFC: " + voter.name + " tried to give " + pronoun + " " + votes_text
 
-    message = mail.EmailMessage(sender="OUARFC <no-reply@ouarfc-vote.appspotmail.com>", subject=subject)
+    message = mail.EmailMessage(sender="OUARFC <vote@ouarfc-vote.appspotmail.com>", subject=subject)
     message.to = "pascoeg@gmail.com"
     message.body = template.render(
       {'name': voter.name, 'opponent': game.opponent, 'date': game.date, 'pronoun': pronoun, 'votes': votes_text})
@@ -66,7 +66,7 @@ class EmailHandler(webapp2.RequestHandler):
 
     template = jinja_environment.get_template('templates/email.txt')
     subject = "OUARFC: Please Vote For Best & Fairest"
-    message = mail.EmailMessage(sender="OUARFC <no-reply@ouarfc-vote.appspotmail.com>", subject=subject)
+    message = mail.EmailMessage(sender="OUARFC <vote@ouarfc-vote.appspotmail.com>", subject=subject)
     message.to = player.email
     message.body = template.render(
       {'name':player.name, 'opponent':game.opponent, 'date':game.date, 'team': Team.getString(game.team), 'url':url})
