@@ -4,11 +4,11 @@
 <h1>Add a game</h1>
 <form method="POST" action="/admin/add_game">
     <label for="opponent">Opponent: </label><br>
-    <input type="text" name="opponent" id="opponent" placeholder="Cambridge"><br>
+    <input type="text" name="opponent" id="opponent" placeholder="e.g. Cambridge"><br>
     <label for="date">Date: </label><br>
-    <input type="date" name="date" id="date" placeholder="7/3/2016"><br>
+    <input type="date" name="date" id="date" placeholder="dd/mm/yyyy"><br>
     <label for="venue">Venue: </label><br>
-    <input type="text" name="venue" id="venue" placeholder="Oxford"><br>
+    <input type="text" name="venue" id="venue" placeholder="e.g. Oxford"><br>
     <label for="team">Team: </label><br>
     <select name="team" id="team">
         {% for t in teams -%}
