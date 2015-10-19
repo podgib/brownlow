@@ -66,7 +66,11 @@ class AddGameHandler(webapp2.RequestHandler):
     team = Team.getTeam(self.request.get("team"))
 
     date_tokens = date_string.split("/")
-    date = datetime.date(int(date_tokens[2]), int(date_tokens[1]), int(date_tokens[0]))
+    if len(date_tokens) == 1:
+      date_tokens = date_string.split("-")
+    if int(date_tokens[0] < 100):
+      date_tokens.reverse()
+    date = datetime.date(int(date_tokens[0]), int(date_tokens[1]), int(date_tokens[2]))
 
     game = Game(opponent=opponent, date=date, venue=venue, team=team)
     player_ids = [int(pid) for pid in player_id_strings]
