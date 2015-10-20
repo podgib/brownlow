@@ -68,7 +68,7 @@ class AddGameHandler(webapp2.RequestHandler):
     date_tokens = date_string.split("/")
     if len(date_tokens) == 1:
       date_tokens = date_string.split("-")
-    if int(date_tokens[0] < 100):
+    if int(date_tokens[0]) < 100:
       date_tokens.reverse()
     date = datetime.date(int(date_tokens[0]), int(date_tokens[1]), int(date_tokens[2]))
 
