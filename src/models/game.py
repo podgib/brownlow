@@ -2,8 +2,8 @@ from google.appengine.ext import db
 from player import Player
 
 class Team:
-  MEN = 0
-  WOMEN = 1
+  MEN = 1
+  WOMEN = 2
   TEST = -1
 
   @staticmethod
