@@ -1,0 +1,14 @@
+{% extends 'templates/layout.html' %}
+
+{% block content %}
+<h1>View Results</h1>
+<h2>Select Team</h2>
+<ul>
+{% for t in teams %}
+
+<li><a href="/results/{{t}}">{{t}}</a></li>
+
+{% endfor %}
+</ul>
+
+{% endblock %}
