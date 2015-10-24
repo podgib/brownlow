@@ -9,6 +9,18 @@ class Vote(db.Model):
   two = db.ReferenceProperty(Player, collection_name="two")
   one = db.ReferenceProperty(Player, collection_name="one")
 
+class PlayerGameVotes(db.Model):
+  game = db.ReferenceProperty(Game, required=True)
+  player = db.ReferenceProperty(Player, required=True)
+  threes = db.IntegerProperty(default=0)
+  twos = db.IntegerProperty(default=0)
+  ones = db.IntegerProperty(default=0)
+
+  def ranking_points(self):
+    # Ranking is by total votes, then number of threes, then number of twos
+    return 3 * self.threes + 2 * self.twos + self.ones \
+           + self.threes / 1000.0 + self.twos / 1000000.0
+
 class SelfVote(db.Model):
   game = db.ReferenceProperty(Game, required=True)
   voter = db.ReferenceProperty(Player)

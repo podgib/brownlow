@@ -75,5 +75,43 @@ class NoVotesTestCase(unittest.TestCase):
   def tearDown(self):
     self.testbed.deactivate()
 
+
+class TieBreakTestCase(unittest.TestCase):
+  def setUp(self):
+    self.testbed = testbed.Testbed()
+    self.testbed.activate()
+    self.testbed.init_datastore_v3_stub()
+
+    g = Game(opponent='test', date=datetime.date.today(), venue='test', team=Team.TEST)
+
+    players = []
+    for i in range(0, 10):
+      p = Player(name='Player ' + str(i))
+      p.put()
+      players.append(p)
+
+    g.players = [p.key() for p in players]
+    g.put()
+
+    v = Vote(game=g, three=players[3], two=players[4], one=players[5])
+    v.put()
+    v = Vote(game=g, three=players[7], two=players[4], one=players[3])
+    v.put()
+
+  def testGameResults(self):
+    g = Game.all().get()
+    results = game_results(g)
+
+    three = Player.get(results['three'])
+    two = Player.get(results['two'])
+    one = Player.get(results['one'])
+
+    self.assertEqual('Player 3', three.name)
+    self.assertEqual('Player 4', two.name)
+    self.assertEqual('Player 7', one.name)
+
+  def tearDown(self):
+    self.testbed.deactivate()
+
 if __name__ == '__main__':
   unittest.main()
