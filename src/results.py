@@ -41,6 +41,10 @@ def game_results(game):
     else:
       player_votes[one.key()] = 1
 
+  if len(player_votes) < 3:
+    # No votes cast
+    return None
+
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1])
 
   return {'three': sorted_votes[0][0], 'two': sorted_votes[1][0], 'one': sorted_votes[2][0]}

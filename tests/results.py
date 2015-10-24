@@ -48,5 +48,32 @@ class SingleGameTestCase(unittest.TestCase):
   def tearDown(self):
     self.testbed.deactivate()
 
+class NoVotesTestCase(unittest.TestCase):
+  def setUp(self):
+    self.testbed = testbed.Testbed()
+    self.testbed.activate()
+    self.testbed.init_datastore_v3_stub()
+
+    g = Game(opponent='test', date=datetime.date.today(), venue='test', team=Team.TEST)
+
+    players = []
+    for i in range(0, 10):
+      p = Player(name='Player ' + str(i))
+      p.put()
+      players.append(p)
+
+    g.players = [p.key() for p in players]
+    g.put()
+
+  def testGameResults(self):
+    g = Game.all().get()
+
+    results = game_results(g)
+
+    self.assertIsNone(results)
+
+  def tearDown(self):
+    self.testbed.deactivate()
+
 if __name__ == '__main__':
   unittest.main()
