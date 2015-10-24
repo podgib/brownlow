@@ -31,17 +31,17 @@ def game_results(game):
 
     two = vote.two
     if player_votes.has_key(two.key()):
-      player_votes[two.key()] = player_votes[two.key()] + 3
+      player_votes[two.key()] = player_votes[two.key()] + 2
     else:
-      player_votes[two.key()] = 3
+      player_votes[two.key()] = 2
 
     one = vote.one
     if player_votes.has_key(one.key()):
-      player_votes[one.key()] = player_votes[one.key()] + 3
+      player_votes[one.key()] = player_votes[one.key()] + 1
     else:
-      player_votes[one.key()] = 3
+      player_votes[one.key()] = 1
 
-  sorted_votes = sorted(player_votes.items(), key=-operator.itemgetter(1))
+  sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1])
 
   return {'three': sorted_votes[0][0], 'two': sorted_votes[1][0], 'one': sorted_votes[2][0]}
 
