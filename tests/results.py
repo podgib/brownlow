@@ -93,9 +93,17 @@ class TieBreakTestCase(unittest.TestCase):
     g.players = [p.key() for p in players]
     g.put()
 
-    v = Vote(game=g, three=players[3], two=players[4], one=players[5])
+    # Rankings:
+    # Player 3 - 7 votes (two threes)
+    # Player 4 - 7 votes (one three, two twos)
+    # Player 7 - 7 votes (one three, one two)
+    v = Vote(game=g, three=players[3], two=players[4], one=players[7])
     v.put()
-    v = Vote(game=g, three=players[7], two=players[4], one=players[3])
+    v = Vote(game=g, three=players[7], two=players[4], one=players[5])
+    v.put()
+    v = Vote(game=g, three=players[3], two=players[9], one=players[7])
+    v.put()
+    v = Vote(game=g, three=players[4], two=players[7], one=players[3])
     v.put()
 
   def testGameResults(self):
