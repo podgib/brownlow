@@ -38,3 +38,9 @@ class Game(db.Model):
   venue = db.StringProperty(required=True)
   team = db.IntegerProperty(required=True)
   players = db.ListProperty(db.Key)
+
+class GameResults(db.Model):
+  game = db.ReferenceProperty(Game, required=True)
+  three = db.ReferenceProperty(Player, collection_name="three_game_votes")
+  two = db.ReferenceProperty(Player, collection_name="two_game_votes")
+  one = db.ReferenceProperty(Player, collection_name="one_game_votes")

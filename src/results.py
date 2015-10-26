@@ -6,8 +6,9 @@ import webapp2
 
 from models.game import Team
 from models.game import Game
+from models.game import GameResults
 from models.vote import Vote
-from models.vote import PlayerGameVotes
+from models.vote import PlayerGameVotes, PlayerOverallVotes
 from models.player import Player
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -48,8 +49,37 @@ def game_results(game):
     return None
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
+  players = Player.get([sorted_votes[0][0], sorted_votes[1][0], sorted_votes[2][0]])
+  result = GameResults(game=game, three=players[0], two=players[1], one=players[2])
 
-  return {'three': sorted_votes[0][0], 'two': sorted_votes[1][0], 'one': sorted_votes[2][0]}
+  return result
+
+def overall_results(team):
+  games = Game.all().filter("team =", team).order("date").run()
+  player_votes = {}
+
+  for game in games:
+    results = game_results(game)
+    if not results:
+      continue
+
+    if player_votes.has_key(results.three.key()):
+      player_votes[results.three.key()].threes +=1
+    else:
+      player_votes[results.three.key()] = PlayerOverallVotes(player=results.three, threes=1)
+
+    if player_votes.has_key(results.two.key()):
+      player_votes[results.two.key()].twos +=1
+    else:
+      player_votes[results.two.key()] = PlayerOverallVotes(player=results.two, twos=1)
+
+    if player_votes.has_key(results.one.key()):
+      player_votes[results.one.key()].ones +=1
+    else:
+      player_votes[results.one.key()] = PlayerOverallVotes(player=results.one, ones=1)
+
+  sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
+  return [r[1] for r in sorted_votes]
 
 class ResultsHandler(webapp2.RequestHandler):
 
