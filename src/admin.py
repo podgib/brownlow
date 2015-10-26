@@ -6,6 +6,7 @@ import logging
 import datetime
 
 from google.appengine.api import taskqueue
+from google.appengine.api import users
 
 from models.player import Player
 from models.game import Game
@@ -158,6 +159,11 @@ class ResultsHandler(webapp2.RequestHandler):
       return
 
     results = overall_results(team)
+
+    if team != Team.TEST and users.get_current_user().email() != "kyleturner24@gmail.com":
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "You don't have permission to view real results"}))
+      return
 
     params = {'team':team, 'results':results}
     template = jinja_environment.get_template("templates/results.html")
