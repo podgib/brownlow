@@ -98,7 +98,13 @@ class ResultsHandler(webapp2.RequestHandler):
       self.response.out.write(template.render({'errmsg':'Invalid team: ' + team_name}))
       return
 
-    games = Game.all().filter("team =", team).run()
+    results = overall_results(team)
+
+    params = {'team':team, 'results':results}
+    template = jinja_environment.get_template("templates/results.html")
+    self.response.out.write(template.render(params))
+
+
 
 
 app = webapp2.WSGIApplication([

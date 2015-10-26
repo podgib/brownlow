@@ -32,6 +32,9 @@ class PlayerOverallVotes(db.Model):
     return 3 * self.threes + 2 * self.twos + self.ones \
            + self.threes / 1000.0 + self.twos / 1000000.0
 
+  def total(self):
+    return 3 * self.threes + 2 * self.twos + self.ones
+
 class SelfVote(db.Model):
   game = db.ReferenceProperty(Game, required=True)
   voter = db.ReferenceProperty(Player)

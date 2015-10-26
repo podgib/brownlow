@@ -6,7 +6,7 @@
 <ul>
 {% for t in teams %}
 
-<li><a href="/results/{{t}}">{{t}}</a></li>
+<li><a href="/results/{{t|lower}}">{{t}}</a></li>
 
 {% endfor %}
 </ul>

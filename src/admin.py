@@ -85,8 +85,8 @@ class AddGameHandler(webapp2.RequestHandler):
 class GenerateTokenHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template("templates/generate_token.html")
-    games = Game.all().run()
-    players = Player.all().run()
+    games = Game.all().order('date').run()
+    players = Player.all().order('name').run()
     args = {'games':games,'players':players}
     self.response.out.write(template.render(args))
 
