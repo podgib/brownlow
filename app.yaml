@@ -20,10 +20,6 @@ handlers:
   script: src.admin.app
   login: admin
 
-- url: /results.*
-  script: src.results.app
-  login: admin
-
 - url: .*
   script: src.vote.app
 

@@ -11,15 +11,6 @@ from models.vote import Vote
 from models.vote import PlayerGameVotes, PlayerOverallVotes
 from models.player import Player
 
-jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-jinja_environment.filters['teamString'] = Team.getString
-
-class MenuHandler(webapp2.RequestHandler):
-  def get(self):
-    teams = Team.getAll()
-    template = jinja_environment.get_template("templates/results_menu.html")
-    self.response.out.write(template.render({'teams': teams}))
-
 def game_results(game):
   votes = Vote.all().filter("game =", game).run()
 
@@ -88,26 +79,3 @@ def overall_results(team):
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
   return OverallResults(player_votes=[r[1] for r in sorted_votes], game_votes=game_votes)
-
-class ResultsHandler(webapp2.RequestHandler):
-
-  def get(self, team_name):
-    team = Team.getTeam(team_name)
-    if not team:
-      template = jinja_environment.get_template("templates/error.html")
-      self.response.out.write(template.render({'errmsg':'Invalid team: ' + team_name}))
-      return
-
-    results = overall_results(team)
-
-    params = {'team':team, 'results':results}
-    template = jinja_environment.get_template("templates/results.html")
-    self.response.out.write(template.render(params))
-
-
-
-
-app = webapp2.WSGIApplication([
-  ('/results', MenuHandler),
-  webapp2.Route('/results/<team_name>', handler=ResultsHandler)
-], debug=True)

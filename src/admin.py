@@ -12,6 +12,8 @@ from models.game import Game
 from models.game import Team
 from models.token import Token
 
+from results import game_results, overall_results, OverallResults
+
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 jinja_environment.filters['teamString'] = Team.getString
 
@@ -146,10 +148,33 @@ class EmailHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/emails_sent.html")
     self.response.out.write(template.render({}))
 
+class ResultsHandler(webapp2.RequestHandler):
+
+  def get(self, team_name):
+    team = Team.getTeam(team_name)
+    if not team:
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg':'Invalid team: ' + team_name}))
+      return
+
+    results = overall_results(team)
+
+    params = {'team':team, 'results':results}
+    template = jinja_environment.get_template("templates/results.html")
+    self.response.out.write(template.render(params))
+
+
 class MenuHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template('templates/admin.html')
     self.response.out.write(template.render({}))
+
+class ResultsMenuHandler(webapp2.RequestHandler):
+  def get(self):
+    teams = Team.getAll()
+    template = jinja_environment.get_template("templates/results_menu.html")
+    self.response.out.write(template.render({'teams': teams}))
+
 
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
@@ -157,5 +182,7 @@ app = webapp2.WSGIApplication([
   webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler),
   webapp2.Route('/admin/send_emails', handler=EmailHandler),
   webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler),
+  ('/admin/results', ResultsMenuHandler),
+  webapp2.Route('/admin/results/<team_name>', handler=ResultsHandler),
   ('/admin',MenuHandler), ('/admin/', MenuHandler)
 ], debug=True)
