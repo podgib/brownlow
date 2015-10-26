@@ -45,9 +45,15 @@ class SingleGameTestCase(unittest.TestCase):
     team = Team.TEST
     results = overall_results(team)
 
-    self.assertEqual('Player 4', results[0].player.name)
-    self.assertEqual('Player 7', results[1].player.name)
-    self.assertEqual('Player 1', results[2].player.name)
+    # Overall rankings
+    self.assertEqual('Player 4', results.player_votes[0].player.name)
+    self.assertEqual('Player 7', results.player_votes[1].player.name)
+    self.assertEqual('Player 1', results.player_votes[2].player.name)
+
+    # Per-game rankings
+    self.assertEqual('Player 4', results.game_votes[0].three.name)
+    self.assertEqual('Player 7', results.game_votes[0].two.name)
+    self.assertEqual('Player 1', results.game_votes[0].one.name)
 
   def tearDown(self):
     self.testbed.deactivate()
@@ -79,7 +85,8 @@ class NoVotesTestCase(unittest.TestCase):
   def testOverallResults(self):
     results = overall_results(Team.TEST)
 
-    self.assertEqual(0, len(results))
+    self.assertEqual(0, len(results.player_votes))
+    self.assertEqual(0, len(results.game_votes))
 
   def tearDown(self):
     self.testbed.deactivate()
@@ -125,9 +132,15 @@ class TieBreakTestCase(unittest.TestCase):
   def testOverallResults(self):
     results = overall_results(Team.TEST)
 
-    self.assertEqual('Player 3', results[0].player.name)
-    self.assertEqual('Player 4', results[1].player.name)
-    self.assertEqual('Player 7', results[2].player.name)
+    # Overall rankings
+    self.assertEqual('Player 3', results.player_votes[0].player.name)
+    self.assertEqual('Player 4', results.player_votes[1].player.name)
+    self.assertEqual('Player 7', results.player_votes[2].player.name)
+
+    # Per-game votes
+    self.assertEqual('Player 3', results.game_votes[0].three.name)
+    self.assertEqual('Player 4', results.game_votes[0].two.name)
+    self.assertEqual('Player 7', results.game_votes[0].one.name)
 
   def tearDown(self):
     self.testbed.deactivate()
@@ -138,8 +151,8 @@ class TwoMatchTestCase(unittest.TestCase):
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
 
-    self.g1 = Game(opponent='test', date=datetime.date.today(), venue='test', team=Team.TEST)
-    self.g2 = Game(opponent='test', date=datetime.date.today(), venue='test', team=Team.TEST)
+    self.g1 = Game(opponent='test', date=datetime.date(2015, 10, 01), venue='test', team=Team.TEST)
+    self.g2 = Game(opponent='test', date=datetime.date(2015, 11, 01), venue='test', team=Team.TEST)
 
     players = []
     for i in range(0, 10):
@@ -175,10 +188,21 @@ class TwoMatchTestCase(unittest.TestCase):
   def testOverallResults(self):
     results = overall_results(Team.TEST)
 
-    self.assertEqual('Player 7', results[0].player.name)
-    self.assertEqual('Player 4', results[1].player.name)
-    self.assertEqual('Player 3', results[2].player.name)
-    self.assertEqual('Player 9', results[3].player.name)
+    # Overall rankings
+    self.assertEqual('Player 7', results.player_votes[0].player.name)
+    self.assertEqual('Player 4', results.player_votes[1].player.name)
+    self.assertEqual('Player 3', results.player_votes[2].player.name)
+    self.assertEqual('Player 9', results.player_votes[3].player.name)
+
+    # Game 1
+    self.assertEqual('Player 7', results.game_votes[0].three.name)
+    self.assertEqual('Player 4', results.game_votes[0].two.name)
+    self.assertEqual('Player 9', results.game_votes[0].one.name)
+
+    # Game 2
+    self.assertEqual('Player 3', results.game_votes[1].three.name)
+    self.assertEqual('Player 4', results.game_votes[1].two.name)
+    self.assertEqual('Player 7', results.game_votes[1].one.name)
 
   def tearDown(self):
     self.testbed.deactivate()

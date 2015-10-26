@@ -54,8 +54,14 @@ def game_results(game):
 
   return result
 
+class OverallResults:
+  def __init__(self, player_votes, game_votes):
+    self.player_votes = player_votes
+    self.game_votes = game_votes
+
 def overall_results(team):
   games = Game.all().filter("team =", team).order("date").run()
+  game_votes = []
   player_votes = {}
 
   for game in games:
@@ -78,8 +84,10 @@ def overall_results(team):
     else:
       player_votes[results.one.key()] = PlayerOverallVotes(player=results.one, ones=1)
 
+    game_votes.append(results)
+
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
-  return [r[1] for r in sorted_votes]
+  return OverallResults(player_votes=[r[1] for r in sorted_votes], game_votes=game_votes)
 
 class ResultsHandler(webapp2.RequestHandler):
 
