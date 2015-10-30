@@ -53,9 +53,68 @@ class AddPlayerHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/player_added.html")
     self.response.out.write(template.render({'name':name}))
 
+class EditGameHandler(webapp2.RequestHandler):
+  def get(self, game_id=None):
+    if not game_id:
+      template = jinja_environment.get_template("templates/game_list.html")
+      games = Game.all().order('date').run()
+      self.response.out.write(template.render({'games':games}))
+      return
+
+    game = Game.get_by_id(int(game_id))
+    if not game:
+      self.response.out.write("Error: invalid game ID")
+      logging.error("Invalid game ID: " + str(game_id))
+      return
+
+    teams = Team.getAll();
+
+    players = Player.all().order('name').fetch(100)
+    playing = [p for p in players if p.key() in game.players]
+    not_playing = [p for p in players if p.key() not in game.players]
+
+    template = jinja_environment.get_template("templates/add_edit_game.html")
+    args = {'playing':playing,'not_playing':not_playing,'game':game, 'teams':teams}
+    self.response.out.write(template.render(args))
+
+  def post(self):
+    game_id = self.request.get("game_id")
+    game = Game.get_by_id(int(game_id))
+    if not game:
+      self.response.out.write("Error: invalid game ID")
+      logging.error("Invalid game ID: " + str(game_id))
+      return
+
+    opponent = self.request.get("opponent")
+    date_string = self.request.get("date")
+    venue = self.request.get("venue")
+    player_id_strings = self.request.get_all("players")
+    team = Team.getTeam(self.request.get("team"))
+
+    date_tokens = date_string.split("/")
+    if len(date_tokens) == 1:
+      date_tokens = date_string.split("-")
+    if int(date_tokens[0]) < 100:
+      date_tokens.reverse()
+    date = datetime.date(int(date_tokens[0]), int(date_tokens[1]), int(date_tokens[2]))
+
+    game.opponent = opponent
+    game.date = date
+    game.venue = venue
+    game.team = team
+    player_ids = [int(pid) for pid in player_id_strings]
+    players = Player.get_by_id(player_ids)
+    player_keys = [p.key() for p in players]
+    game.players = player_keys
+    game.put()
+
+    template = jinja_environment.get_template("templates/game_saved.html")
+    self.response.out.write(template.render({}))
+
+
 class AddGameHandler(webapp2.RequestHandler):
   def get(self):
-    template = jinja_environment.get_template("templates/add_game.html")
+    template = jinja_environment.get_template("templates/add_edit_game.html")
     players = Player.all().order('name').run()
     teams = Team.getAll()
     args = {'players':players, 'teams':teams}
@@ -109,7 +168,7 @@ class GenerateTokenHandler(webapp2.RequestHandler):
 class EmailHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
     if not game_id:
-      template = jinja_environment.get_template("templates/game_list.html")
+      template = jinja_environment.get_template("templates/email_list.html")
       games = Game.all().order('date').run()
       self.response.out.write(template.render({'games':games}))
       return
@@ -185,6 +244,8 @@ class ResultsMenuHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
   webapp2.Route('/admin/add_game', handler=AddGameHandler),
+  webapp2.Route('/admin/edit_game', handler=EditGameHandler),
+  webapp2.Route('/admin/edit_game/<game_id>', handler=EditGameHandler),
   webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler),
   webapp2.Route('/admin/send_emails', handler=EmailHandler),
   webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler),

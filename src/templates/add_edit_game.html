@@ -1,0 +1,54 @@
+{% extends 'templates/layout.html' %}
+
+{% block content %}
+{% if game %}
+<h1>Edit Game</h1>
+{% else %}
+<h1>Add a game</h1>
+{% endif %}
+
+{% if game %}
+<form method="POST" action="/admin/edit_game">
+{% else %}
+<form method="POST" action="/admin/add_game">
+{% endif %}
+
+    <label for="opponent">Opponent: </label><br>
+    <input type="text" name="opponent" id="opponent" placeholder="e.g. Cambridge" {% if game %}value="{{game.opponent}}"
+           {% endif %}><br>
+    <label for="date">Date: </label><br>
+    <input type="date" name="date" id="date" placeholder="dd/mm/yyyy" {% if game %}value="{{game.date}}"{% endif %}><br>
+    <label for="venue">Venue: </label><br>
+    <input type="text" name="venue" id="venue" placeholder="e.g. Oxford" {% if game %}value="{{game.venue}}"
+           {% endif %}><br>
+    <label for="team">Team: </label><br>
+    <select name="team" id="team">
+        {% for t in teams -%}
+        <option value="{{t}}" {% if game %}{% if game.team % (teams|length + 1) == loop.index %}selected{% endif %}{% endif %}>{{t}}</option>
+        {% endfor %}
+    </select>
+    <br>
+    {% for p in players %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    {% for p in playing %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}" checked>
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    {% for p in not_playing %}
+    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">
+    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <br>
+    {% endfor %}
+    {% if game %}
+    <input type="hidden" name="game_id" value="{{game.key().id()}}">
+    <input type="submit" name="save" value="save">
+    {% else %}
+    <input type="submit" name="add" value="Add">
+    {% endif %}
+</form>
+
+{% endblock %}
