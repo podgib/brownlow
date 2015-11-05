@@ -22,6 +22,9 @@ ERROR_NO_NAME = 1280
 ERROR_ALREADY_EXISTS = 1281
 ERROR_NO_EMAIL = 1282
 
+mens_results_viewers = ['kyleturner24@gmail.com']
+womens_results_viewers = ['rachel.louise.paterson@gmail.com']
+
 class AddPlayerHandler(webapp2.RequestHandler):
   def get(self):
     errmsg = None
@@ -219,9 +222,14 @@ class ResultsHandler(webapp2.RequestHandler):
 
     results = overall_results(team)
 
-    if team != Team.TEST and users.get_current_user().email() != "kyleturner24@gmail.com":
+    user_email = users.get_current_user().email()
+    if team == Team.MEN and user_email not in mens_results_viewers:
       template = jinja_environment.get_template("templates/error.html")
-      self.response.out.write(template.render({'errmsg': "You don't have permission to view real results"}))
+      self.response.out.write(template.render({'errmsg': "You don't have permission to view Men's results"}))
+      return
+    if team == Team.WOMEN and user_email not in womens_results_viewers:
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg': "You don't have permission to view Women's results"}))
       return
 
     params = {'team':team, 'results':results}
