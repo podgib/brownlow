@@ -23,6 +23,9 @@ handlers:
 - url: .*
   script: src.vote.app
 
+builtins:
+- remote_api: on
+
 libraries:
 - name: webapp2
   version: "2.5.2"
