@@ -20,12 +20,12 @@ class SelfVoteHandler(webapp2.RequestHandler):
     token_string = self.request.get('token')
     num_votes = self.request.get('votes')
 
-    token = Token.all().filter("value =", token_string).get()
+    token = Token.query(Token.value == token_string).get()
     if not token:
       return
 
-    game = token.game
-    voter = token.voter
+    game = token.game.get()
+    voter = token.voter.get()
     num_votes = self.request.get("votes")
     if num_votes == "1":
       votes_text = "1 vote"
@@ -47,7 +47,7 @@ class SelfVoteHandler(webapp2.RequestHandler):
     message.send()
     logging.info(message.body)
 
-    vote = SelfVote(game=game, voter=voter)
+    vote = SelfVote(game=game.key, voter=voter.key)
     vote.put()
 
 class EmailHandler(webapp2.RequestHandler):
@@ -59,7 +59,7 @@ class EmailHandler(webapp2.RequestHandler):
     game = Game.get_by_id(int(game_id))
 
     token_string = base64.urlsafe_b64encode(os.urandom(32))
-    token = Token(value=token_string, voter=player, game=game, used=False)
+    token = Token(value=token_string, voter=player.key, game=game.key, used=False)
     token.put()
 
     url = "http://vote.ouarfc.co.uk/vote/" + token_string

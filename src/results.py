@@ -4,6 +4,8 @@ import logging
 import operator
 import webapp2
 
+from google.appengine.ext import ndb
+
 from models.game import Team
 from models.game import Game
 from models.game import GameResults
@@ -12,36 +14,36 @@ from models.vote import PlayerGameVotes, PlayerOverallVotes
 from models.player import Player
 
 def game_results(game):
-  votes = Vote.query(Vote.game == game.key).run(1000)
+  votes = Vote.query(Vote.game == game.key).fetch(1000)
 
   player_votes = {}
 
   for vote in votes:
     three = vote.three
-    if player_votes.has_key(three.key()):
-      player_votes[three.key()].threes += 1
+    if player_votes.has_key(three):
+      player_votes[three].threes += 1
     else:
-      player_votes[three.key()] = PlayerGameVotes(game=game, player=three, threes=1)
+      player_votes[three] = PlayerGameVotes(game=game.key, player=three, threes=1)
 
     two = vote.two
-    if player_votes.has_key(two.key()):
-      player_votes[two.key()].twos += 1
+    if player_votes.has_key(two):
+      player_votes[two].twos += 1
     else:
-      player_votes[two.key()] = PlayerGameVotes(game=game, player=two, twos=1)
+      player_votes[two] = PlayerGameVotes(game=game.key, player=two, twos=1)
 
     one = vote.one
-    if player_votes.has_key(one.key()):
-      player_votes[one.key()].ones += 1
+    if player_votes.has_key(one):
+      player_votes[one].ones += 1
     else:
-      player_votes[one.key()] = PlayerGameVotes(game=game, player=one, ones=1)
+      player_votes[one] = PlayerGameVotes(game=game.key, player=one, ones=1)
 
   if len(player_votes) < 3:
     # No votes cast
     return None
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
-  players = Player.get([sorted_votes[0][0], sorted_votes[1][0], sorted_votes[2][0]])
-  result = GameResults(game=game, three=players[0], two=players[1], one=players[2])
+  players = [sorted_votes[0][0], sorted_votes[1][0], sorted_votes[2][0]]
+  result = GameResults(game=game.key, three=players[0], two=players[1], one=players[2])
 
   return result
 
@@ -60,20 +62,20 @@ def overall_results(team):
     if not results:
       continue
 
-    if player_votes.has_key(results.three.key()):
-      player_votes[results.three.key()].threes +=1
+    if player_votes.has_key(results.three):
+      player_votes[results.three].threes +=1
     else:
-      player_votes[results.three.key()] = PlayerOverallVotes(player=results.three, threes=1)
+      player_votes[results.three] = PlayerOverallVotes(player=results.three, threes=1)
 
-    if player_votes.has_key(results.two.key()):
-      player_votes[results.two.key()].twos +=1
+    if player_votes.has_key(results.two):
+      player_votes[results.two].twos +=1
     else:
-      player_votes[results.two.key()] = PlayerOverallVotes(player=results.two, twos=1)
+      player_votes[results.two] = PlayerOverallVotes(player=results.two, twos=1)
 
-    if player_votes.has_key(results.one.key()):
-      player_votes[results.one.key()].ones +=1
+    if player_votes.has_key(results.one):
+      player_votes[results.one].ones +=1
     else:
-      player_votes[results.one.key()] = PlayerOverallVotes(player=results.one, ones=1)
+      player_votes[results.one] = PlayerOverallVotes(player=results.one, ones=1)
 
     game_votes.append(results)
 

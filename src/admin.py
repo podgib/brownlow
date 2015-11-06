@@ -7,6 +7,7 @@ import datetime
 
 from google.appengine.api import taskqueue
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 from models.player import Player
 from models.game import Game
@@ -105,9 +106,7 @@ class EditGameHandler(webapp2.RequestHandler):
     game.date = date
     game.venue = venue
     game.team = team
-    player_ids = [int(pid) for pid in player_id_strings]
-    players = Player.get_by_id(player_ids)
-    player_keys = [p.key for p in players]
+    player_keys = [ndb.Key('Player', int(pid)) for pid in player_id_strings]
     game.players = player_keys
     game.put()
 
@@ -138,9 +137,7 @@ class AddGameHandler(webapp2.RequestHandler):
     date = datetime.date(int(date_tokens[0]), int(date_tokens[1]), int(date_tokens[2]))
 
     game = Game(opponent=opponent, date=date, venue=venue, team=team)
-    player_ids = [int(pid) for pid in player_id_strings]
-    players = Player.get_by_id(player_ids)
-    player_keys = [p.key for p in players]
+    player_keys = [ndb.Key('Player', int(pid)) for pid in player_id_strings]
     game.players = player_keys
     game.put()
 
@@ -194,11 +191,10 @@ class EmailHandler(webapp2.RequestHandler):
     game_id = self.request.get('game')
     player_ids = self.request.get_all('players')
 
-    player_ids = [int(p) for p in player_ids]
     game = Game.get_by_id(int(game_id))
-    players = Player.get_by_id(player_ids)
 
-    player_keys = [p.key for p in players]
+    player_keys = [ndb.Key('Player', int(pid)) for pid in player_ids]
+    players = ndb.get_multi(player_keys)
     game.players = player_keys
     game.put()
 

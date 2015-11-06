@@ -10,19 +10,20 @@
 <table class="results">
     <tr><th></th><th>Name</th><th>Votes</th></tr>
     {% for pr in results.player_votes %}
-    <tr><td>{{loop.index}}.</td><td>{{pr.player.name}}</td><td>{{pr.total()}}</td></tr>
+    <tr><td>{{loop.index}}.</td><td>{{pr.player.get().name}}</td><td>{{pr.total()}}</td></tr>
     {% endfor %}
 </table>
 
 {% for gr in results.game_votes %}
+{% set game = gr.game.get() %}
 <div class="game-results">
 <h2 class="results">Game {{loop.index}}</h2>
-<h3 class="results">Oxford vs {{gr.game.opponent}}</h3>
-<h4 class="results">{{gr.game.venue}}, {{gr.game.date}}</h4>
+<h3 class="results">Oxford vs {{game.opponent}}</h3>
+<h4 class="results">{{game.venue}}, {{game.date}}</h4>
 
-<p class="game-results">3. {{gr.three.name}}</p>
-<p class="game-results">2. {{gr.two.name}}</p>
-<p class="game-results">1. {{gr.one.name}}</p>
+<p class="game-results">3. {{gr.three.get().name}}</p>
+<p class="game-results">2. {{gr.two.get().name}}</p>
+<p class="game-results">1. {{gr.one.get().name}}</p>
 
 </div>
 {% endfor %}

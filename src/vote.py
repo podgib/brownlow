@@ -68,14 +68,14 @@ class VoteHandler(webapp2.RequestHandler):
     if one in [two, three] or two == three:
       return self.redirect("/vote/" + token.value + "?err=" + str(ERROR_DUPLICATE_VOTE))
 
-    if str(voter.key().id()) in [one, two, three]:
+    if str(voter.id()) in [one, two, three]:
       return self.redirect("/vote/" + token.value + "?err=" + str(ERROR_VOTE_FOR_SELF))
 
     three_player = Player.get_by_id(int(three))
     two_player = Player.get_by_id(int(two))
     one_player = Player.get_by_id(int(one))
 
-    vote = Vote(game=game, three=three_player, two=two_player, one=one_player)
+    vote = Vote(game=game, three=three_player.key, two=two_player.key, one=one_player.key)
     token.used = True
 
     vote.put()
