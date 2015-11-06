@@ -1,6 +1,5 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
-class Player(db.Model):
-  name = db.StringProperty(required=True)
-  email = db.EmailProperty()
-  photo = db.URLProperty()
+class Player(ndb.Model):
+  name = ndb.StringProperty(required=True)
+  email = ndb.StringProperty()

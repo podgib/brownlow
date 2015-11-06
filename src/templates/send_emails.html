@@ -10,16 +10,16 @@
 <p>Please confirm who played:</p>
 <form method="POST" action="/admin/send_emails">
     {% for p in playing %}
-    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}" checked>
-    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}" checked>
+    <label for="{{p.key.id()}}">{{p.name}}</label>
     <br>
     {% endfor %}
     {% for p in not_playing %}
-    <input type="checkbox" name="players" id="{{p.key().id()}}" value="{{p.key().id()}}">
-    <label for="{{p.key().id()}}">{{p.name}}</label>
+    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}">
+    <label for="{{p.key.id()}}">{{p.name}}</label>
     <br>
     {% endfor %}
-    <input type="hidden" name="game" value="{{game.key().id()}}">
+    <input type="hidden" name="game" value="{{game.key.id()}}">
     <input type="submit" name="send" value="Send">
 </form>
 

@@ -4,7 +4,7 @@ import os
 import jinja2
 import logging
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.api import mail
 
 from models.game import Team
@@ -20,7 +20,7 @@ ERROR_VOTE_FOR_SELF = 1281
 
 class VoteHandler(webapp2.RequestHandler):
   def get(self, token_string):
-    token = Token.all().filter("value =", token_string).get()
+    token = Token.query(Token.value == token_string).get()
     if not token:
       template = jinja_environment.get_template("templates/error.html")
       self.response.out.write(template.render({'errmsg': "invalid voting token"}))
@@ -30,10 +30,10 @@ class VoteHandler(webapp2.RequestHandler):
       self.response.out.write(template.render({'errmsg': "You've already voted!"}))
       return
 
-    voter = token.voter;
+    voter = token.voter.get();
 
-    game = token.game
-    players = Player.get(game.players)
+    game = token.game.get()
+    players = ndb.get_multi(game.players)
     players.sort(key=lambda p: p.name)
 
     errmsg = None
@@ -48,7 +48,7 @@ class VoteHandler(webapp2.RequestHandler):
 
   def post(self):
     token_string = self.request.get("token")
-    token = Token.all().filter("value =", token_string).get()
+    token = Token.query(Token.value == token_string).get()
     if not token:
       template = jinja_environment.get_template("templates/error.html")
       self.response.out.write(template.render({'errmsg': "invalid voting token"}))

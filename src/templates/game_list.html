@@ -4,7 +4,7 @@
 <h1>Edit Game</h1>
 <ul>
     {% for g in games -%}
-    <li><a href="/admin/edit_game/{{g.key().id()}}">Oxford vs {{g.opponent}},
+    <li><a href="/admin/edit_game/{{g.key.id()}}">Oxford vs {{g.opponent}},
         {{g.date}} ({{g.team|teamString}})</a></li>
     {%- endfor %}
 </ul>

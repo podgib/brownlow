@@ -46,7 +46,7 @@ class AddPlayerHandler(webapp2.RequestHandler):
     if not email:
       self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_NO_EMAIL))
       return
-    if Player.all().filter("name =", name).count() > 0:
+    if Player.query(Player.name == name).count() > 0:
       self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_ALREADY_EXISTS))
       return
 
@@ -60,7 +60,7 @@ class EditGameHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
     if not game_id:
       template = jinja_environment.get_template("templates/game_list.html")
-      games = Game.all().order('date').run()
+      games = Game.query().order(Game.date).fetch(100)
       self.response.out.write(template.render({'games':games}))
       return
 
@@ -72,9 +72,9 @@ class EditGameHandler(webapp2.RequestHandler):
 
     teams = Team.getAll();
 
-    players = Player.all().order('name').fetch(100)
-    playing = [p for p in players if p.key() in game.players]
-    not_playing = [p for p in players if p.key() not in game.players]
+    players = Player.query().order(Player.name).fetch(100)
+    playing = [p for p in players if p.key in game.players]
+    not_playing = [p for p in players if p.key not in game.players]
 
     template = jinja_environment.get_template("templates/add_edit_game.html")
     args = {'playing':playing,'not_playing':not_playing,'game':game, 'teams':teams}
@@ -107,7 +107,7 @@ class EditGameHandler(webapp2.RequestHandler):
     game.team = team
     player_ids = [int(pid) for pid in player_id_strings]
     players = Player.get_by_id(player_ids)
-    player_keys = [p.key() for p in players]
+    player_keys = [p.key for p in players]
     game.players = player_keys
     game.put()
 
@@ -118,7 +118,7 @@ class EditGameHandler(webapp2.RequestHandler):
 class AddGameHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template("templates/add_edit_game.html")
-    players = Player.all().order('name').run()
+    players = Player.query().order(Player.name).fetch(1000)
     teams = Team.getAll()
     args = {'players':players, 'teams':teams}
     self.response.out.write(template.render(args))
@@ -140,7 +140,7 @@ class AddGameHandler(webapp2.RequestHandler):
     game = Game(opponent=opponent, date=date, venue=venue, team=team)
     player_ids = [int(pid) for pid in player_id_strings]
     players = Player.get_by_id(player_ids)
-    player_keys = [p.key() for p in players]
+    player_keys = [p.key for p in players]
     game.players = player_keys
     game.put()
 
@@ -150,8 +150,8 @@ class AddGameHandler(webapp2.RequestHandler):
 class GenerateTokenHandler(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template("templates/generate_token.html")
-    games = Game.all().order('date').run()
-    players = Player.all().order('name').run()
+    games = Game.query().order(Game.date).fetch(100)
+    players = Player.query().order(Player.name).fetch(1000)
     args = {'games':games,'players':players}
     self.response.out.write(template.render(args))
 
@@ -163,7 +163,7 @@ class GenerateTokenHandler(webapp2.RequestHandler):
     game = Game.get_by_id(int(game_id))
 
     value = base64.urlsafe_b64encode(os.urandom(32))
-    token = Token(value=value, voter=voter, game=game, used=False)
+    token = Token(value=value, voter=voter.key, game=game.key, used=False)
     token.put()
     url = "http://vote.ouarfc.co.uk/vote/" + value
     self.response.out.write(url)
@@ -172,7 +172,7 @@ class EmailHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
     if not game_id:
       template = jinja_environment.get_template("templates/email_list.html")
-      games = Game.all().order('date').run()
+      games = Game.query().order(Game.date).fetch(100)
       self.response.out.write(template.render({'games':games}))
       return
 
@@ -182,9 +182,9 @@ class EmailHandler(webapp2.RequestHandler):
       logging.error("Invalid game ID: " + str(game_id))
       return
 
-    players = Player.all().order('name').fetch(100)
-    playing = [p for p in players if p.key() in game.players]
-    not_playing = [p for p in players if p.key() not in game.players]
+    players = Player.query().order(Player.name).fetch(100)
+    playing = [p for p in players if p.key in game.players]
+    not_playing = [p for p in players if p.key not in game.players]
 
     template = jinja_environment.get_template("templates/send_emails.html")
     args = {'playing':playing,'not_playing':not_playing,'game':game}
@@ -198,13 +198,13 @@ class EmailHandler(webapp2.RequestHandler):
     game = Game.get_by_id(int(game_id))
     players = Player.get_by_id(player_ids)
 
-    player_keys = [p.key() for p in players]
+    player_keys = [p.key for p in players]
     game.players = player_keys
     game.put()
 
     params = {'player':0, 'game':game_id}
     for p in players:
-      params['player'] = p.key().id()
+      params['player'] = p.key.id()
       taskqueue.add(url='/worker/email', params=params, queue_name='email', countdown=0)
       logging.info('Submitted task to email' + p.email)
 

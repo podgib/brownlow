@@ -1,31 +1,31 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from player import Player
 from game import Game
 
-class Vote(db.Model):
-  game = db.ReferenceProperty(Game, required=True)
-  voter = db.ReferenceProperty(Player, collection_name="voter")
-  three = db.ReferenceProperty(Player, collection_name="three_votes")
-  two = db.ReferenceProperty(Player, collection_name="two_votes")
-  one = db.ReferenceProperty(Player, collection_name="one_votes")
+class Vote(ndb.Model):
+  game = ndb.KeyProperty(kind=Game, required=True)
+  voter = ndb.KeyProperty(kind=Player)
+  three = ndb.KeyProperty(kind=Player)
+  two = ndb.KeyProperty(kind=Player)
+  one = ndb.KeyProperty(kind=Player)
 
-class PlayerGameVotes(db.Model):
-  game = db.ReferenceProperty(Game, required=True)
-  player = db.ReferenceProperty(Player, required=True)
-  threes = db.IntegerProperty(default=0)
-  twos = db.IntegerProperty(default=0)
-  ones = db.IntegerProperty(default=0)
+class PlayerGameVotes(ndb.Model):
+  game = ndb.KeyProperty(kind=Game, required=True)
+  player = ndb.KeyProperty(kind=Player, required=True)
+  threes = ndb.IntegerProperty(default=0)
+  twos = ndb.IntegerProperty(default=0)
+  ones = ndb.IntegerProperty(default=0)
 
   def ranking_points(self):
     # Ranking is by total votes, then number of threes, then number of twos
     return 3 * self.threes + 2 * self.twos + self.ones \
            + self.threes / 1000.0 + self.twos / 1000000.0
 
-class PlayerOverallVotes(db.Model):
-  player = db.ReferenceProperty(Player, required=True)
-  threes = db.IntegerProperty(default=0)
-  twos = db.IntegerProperty(default=0)
-  ones = db.IntegerProperty(default=0)
+class PlayerOverallVotes(ndb.Model):
+  player = ndb.KeyProperty(kind=Player, required=True)
+  threes = ndb.IntegerProperty(default=0)
+  twos = ndb.IntegerProperty(default=0)
+  ones = ndb.IntegerProperty(default=0)
 
   def ranking_points(self):
     # Ranking is by total votes, then number of threes, then number of twos
@@ -35,6 +35,6 @@ class PlayerOverallVotes(db.Model):
   def total(self):
     return 3 * self.threes + 2 * self.twos + self.ones
 
-class SelfVote(db.Model):
-  game = db.ReferenceProperty(Game, required=True)
-  voter = db.ReferenceProperty(Player)
+class SelfVote(ndb.Model):
+  game = ndb.KeyProperty(kind=Game, required=True)
+  voter = ndb.KeyProperty(kind=Player)

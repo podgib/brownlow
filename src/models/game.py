@@ -1,4 +1,4 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from player import Player
 
 class Team:
@@ -32,15 +32,15 @@ class Team:
     else:
       return None
 
-class Game(db.Model):
-  opponent = db.StringProperty(required=True)
-  date = db.DateProperty(required=True, auto_now_add=True)
-  venue = db.StringProperty(required=True)
-  team = db.IntegerProperty(required=True)
-  players = db.ListProperty(db.Key)
+class Game(ndb.Model):
+  opponent = ndb.StringProperty(required=True)
+  date = ndb.DateProperty(required=True, auto_now_add=True)
+  venue = ndb.StringProperty(required=True)
+  team = ndb.IntegerProperty(required=True)
+  players = ndb.KeyProperty(kind=Player, repeated=True)
 
-class GameResults(db.Model):
-  game = db.ReferenceProperty(Game, required=True)
-  three = db.ReferenceProperty(Player, collection_name="three_game_votes")
-  two = db.ReferenceProperty(Player, collection_name="two_game_votes")
-  one = db.ReferenceProperty(Player, collection_name="one_game_votes")
+class GameResults(ndb.Model):
+  game = ndb.KeyProperty(kind=Game, required=True)
+  three = ndb.KeyProperty(kind=Player)
+  two = ndb.KeyProperty(kind=Player)
+  one = ndb.KeyProperty(kind=Player)

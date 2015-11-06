@@ -6,13 +6,13 @@
     <label for="player">Player:</label><br>
     <select id="player" name="player">
         {% for p in players -%}
-          <option value="{{p.key().id()}}">{{p.name}}</option>
+          <option value="{{p.key.id()}}">{{p.name}}</option>
         {%- endfor %}
     </select><br>
     <label for="game">Game:</label><br>
     <select id="game" name="game">
         {% for g in games -%}
-        <option value="{{g.key().id()}}">Oxford vs {{g.opponent}}, {{g.date}} ({{g.team|teamString}})</option>
+        <option value="{{g.key.id()}}">Oxford vs {{g.opponent}}, {{g.date}} ({{g.team|teamString}})</option>
         {%- endfor %}
     </select><br>
     <input type="submit" name="generate" value="Generate">

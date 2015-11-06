@@ -1,10 +1,10 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 from player import Player
 from game import Game
 
-class Token(db.Model):
-  value = db.StringProperty(required=True)
-  voter = db.ReferenceProperty(Player, required=True)
-  game = db.ReferenceProperty(Game, required=True)
-  used = db.BooleanProperty(default=False, required=True)
+class Token(ndb.Model):
+  value = ndb.StringProperty(required=True)
+  voter = ndb.KeyProperty(kind=Player, required=True)
+  game = ndb.KeyProperty(kind=Game, required=True)
+  used = ndb.BooleanProperty(default=False, required=True)

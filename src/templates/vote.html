@@ -10,19 +10,19 @@
     <label for="three">3 Votes (best on ground):</label><br>
     <select id="three" name="three">
         {% for p in players -%}
-          <option value="{{p.key().id()}}">{{p.name}}</option>
+          <option value="{{p.key.id()}}">{{p.name}}</option>
         {%- endfor %}
     </select><br>
     <label for="two">2 Votes:</label><br>
     <select id="two" name="two">
         {% for p in players -%}
-        <option value="{{p.key().id()}}">{{p.name}}</option>
+        <option value="{{p.key.id()}}">{{p.name}}</option>
         {%- endfor %}
     </select><br>
     <label for="one">1 Vote:</label><br>
     <select id="one" name="one">
         {% for p in players -%}
-        <option value="{{p.key().id()}}">{{p.name}}</option>
+        <option value="{{p.key.id()}}">{{p.name}}</option>
         {%- endfor %}
     </select><br>
     <input type="hidden" name="token" value="{{token}}">
@@ -34,7 +34,7 @@
       var three = document.getElementById("three").value;
       var two = document.getElementById("two").value;
       var one = document.getElementById("one").value;
-      var voter = "{{voter.key().id()}}";
+      var voter = "{{voter.key.id()}}";
       var name = "{{voter.name}}".split(" ")[0];
 
       if (three == voter || two == voter || one == voter) {

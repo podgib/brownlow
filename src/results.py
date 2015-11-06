@@ -12,7 +12,7 @@ from models.vote import PlayerGameVotes, PlayerOverallVotes
 from models.player import Player
 
 def game_results(game):
-  votes = Vote.all().filter("game =", game).run()
+  votes = Vote.query(Vote.game == game.key).run(1000)
 
   player_votes = {}
 
@@ -51,7 +51,7 @@ class OverallResults:
     self.game_votes = game_votes
 
 def overall_results(team):
-  games = Game.all().filter("team =", team).order("date").run()
+  games = Game.query(Game.team == team).order(Game.date).fetch(100)
   game_votes = []
   player_votes = {}
 
