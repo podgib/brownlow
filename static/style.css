@@ -10,9 +10,24 @@ body {
     height: 100%;
     max-width: 480px;
     margin: 0 auto;
-    background: #022B5E;
-    box-shadow: 0 0 10px 0px #000000;
+    background: #E0DED9;
 }
+
+div#column {
+    min-height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    background: #022B5E;
+    box-shadow: 0 0 10px 0 #000000;
+}
+
+div#content {
+    padding: 16px;
+    background: #022B5E;
+    color: white;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
 
 h1 {
     margin-bottom: 0.5em;
@@ -103,14 +118,6 @@ p.error {
 
 a, a:visited {
     color: white;
-}
-
-div#content {
-    margin: 0 auto;
-    padding: 16px;
-    background: #022B5E;
-    color: white;
-    font-family: Helvetica, Arial, sans-serif;
 }
 
 div.game-results {
