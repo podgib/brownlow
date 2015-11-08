@@ -156,3 +156,8 @@ table.results {
 .results td:last-child {
     text-align: right;
 }
+
+.note {
+    font-size: 0.6em;
+    padding-top: 0.5em;
+}

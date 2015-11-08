@@ -43,7 +43,7 @@ def game_results(game):
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
   players = [sorted_votes[0][0], sorted_votes[1][0], sorted_votes[2][0]]
-  result = GameResults(game=game.key, three=players[0], two=players[1], one=players[2])
+  result = GameResults(game=game.key, three=players[0], two=players[1], one=players[2], voters=len(votes))
 
   return result
 

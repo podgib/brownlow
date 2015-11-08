@@ -41,6 +41,7 @@ class SingleGameTestCase(unittest.TestCase):
     self.assertEqual('Player 4', results.three.get().name)
     self.assertEqual('Player 7', results.two.get().name)
     self.assertEqual('Player 1', results.one.get().name)
+    self.assertEqual(10, results.voters)
 
   def testOverallResults(self):
     team = Team.TEST
@@ -55,6 +56,7 @@ class SingleGameTestCase(unittest.TestCase):
     self.assertEqual('Player 4', results.game_votes[0].three.get().name)
     self.assertEqual('Player 7', results.game_votes[0].two.get().name)
     self.assertEqual('Player 1', results.game_votes[0].one.get().name)
+    self.assertEqual(10, results.game_votes[0].voters)
 
   def tearDown(self):
     self.testbed.deactivate()
@@ -131,6 +133,7 @@ class TieBreakTestCase(unittest.TestCase):
     self.assertEqual('Player 3', results.three.get().name)
     self.assertEqual('Player 4', results.two.get().name)
     self.assertEqual('Player 7', results.one.get().name)
+    self.assertEqual(4, results.voters)
 
   def testOverallResults(self):
     results = overall_results(Team.TEST)
@@ -144,6 +147,7 @@ class TieBreakTestCase(unittest.TestCase):
     self.assertEqual('Player 3', results.game_votes[0].three.get().name)
     self.assertEqual('Player 4', results.game_votes[0].two.get().name)
     self.assertEqual('Player 7', results.game_votes[0].one.get().name)
+    self.assertEqual(4, results.game_votes[0].voters)
 
   def tearDown(self):
     self.testbed.deactivate()
@@ -183,11 +187,13 @@ class TwoMatchTestCase(unittest.TestCase):
     self.assertEqual('Player 7', results.three.get().name)
     self.assertEqual('Player 4', results.two.get().name)
     self.assertEqual('Player 9', results.one.get().name)
+    self.assertEqual(2, results.voters)
 
     results = game_results(self.g2)
     self.assertEqual('Player 3', results.three.get().name)
     self.assertEqual('Player 4', results.two.get().name)
     self.assertEqual('Player 7', results.one.get().name)
+    self.assertEqual(1, results.voters)
 
   def testOverallResults(self):
     results = overall_results(Team.TEST)
@@ -202,11 +208,13 @@ class TwoMatchTestCase(unittest.TestCase):
     self.assertEqual('Player 7', results.game_votes[0].three.get().name)
     self.assertEqual('Player 4', results.game_votes[0].two.get().name)
     self.assertEqual('Player 9', results.game_votes[0].one.get().name)
+    self.assertEqual(2, results.game_votes[0].voters)
 
     # Game 2
     self.assertEqual('Player 3', results.game_votes[1].three.get().name)
     self.assertEqual('Player 4', results.game_votes[1].two.get().name)
     self.assertEqual('Player 7', results.game_votes[1].one.get().name)
+    self.assertEqual(1, results.game_votes[1].voters)
 
   def tearDown(self):
     self.testbed.deactivate()

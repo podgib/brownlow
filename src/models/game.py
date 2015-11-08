@@ -44,3 +44,4 @@ class GameResults(ndb.Model):
   three = ndb.KeyProperty(kind=Player)
   two = ndb.KeyProperty(kind=Player)
   one = ndb.KeyProperty(kind=Player)
+  voters = ndb.IntegerProperty(default=0)
