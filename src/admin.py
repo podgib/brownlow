@@ -23,7 +23,7 @@ ERROR_NO_NAME = 1280
 ERROR_ALREADY_EXISTS = 1281
 ERROR_NO_EMAIL = 1282
 
-mens_results_viewers = ['kyleturner24@gmail.com']
+mens_results_viewers = ['kyleturner24@gmail.com', 'eugene.duff@gmail.com']
 womens_results_viewers = ['rachel.louise.paterson@gmail.com']
 
 class AddPlayerHandler(webapp2.RequestHandler):
