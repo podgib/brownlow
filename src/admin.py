@@ -219,16 +219,13 @@ class ResultsHandler(webapp2.RequestHandler):
     results = overall_results(team)
 
     user_email = users.get_current_user().email()
-    if team == Team.MEN and user_email not in mens_results_viewers:
-      template = jinja_environment.get_template("templates/error.html")
-      self.response.out.write(template.render({'errmsg': "You don't have permission to view Men's results"}))
-      return
-    if team == Team.WOMEN and user_email not in womens_results_viewers:
-      template = jinja_environment.get_template("templates/error.html")
-      self.response.out.write(template.render({'errmsg': "You don't have permission to view Women's results"}))
-      return
+    authorised = True
+    if team == Team.MEN:
+      authorised = user_email in mens_results_viewers
+    if team == Team.WOMEN:
+      authorised = user_email in womens_results_viewers
 
-    params = {'team':team, 'results':results}
+    params = {'team':team, 'results':results, 'authorised':authorised}
     template = jinja_environment.get_template("templates/results.html")
     self.response.out.write(template.render(params))
 

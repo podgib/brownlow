@@ -7,12 +7,16 @@
 <p>No results available yet</p>
 {% else %}
 
+{% if authorised %}
 <table class="results">
     <tr><th></th><th>Name</th><th>Votes</th></tr>
     {% for pr in results.player_votes %}
     <tr><td>{{loop.index}}.</td><td>{{pr.player.get().name}}</td><td>{{pr.total()}}</td></tr>
     {% endfor %}
 </table>
+{% else %}
+<p>You are not authorised to view these results.</p>
+{% endif %}
 
 {% for gr in results.game_votes %}
 {% set game = gr.game.get() %}
@@ -21,10 +25,14 @@
 <h3 class="results">Oxford vs {{game.opponent}}</h3>
 <h4 class="results">{{game.venue}}, {{game.date}}</h4>
 
+{% if authorised %}
 <p class="game-results">3. {{gr.three.get().name}}</p>
 <p class="game-results">2. {{gr.two.get().name}}</p>
 <p class="game-results">1. {{gr.one.get().name}}</p>
-<p class="note">Votes received from {{gr.voters}} people</p>
+{% else %}
+<p>You are not authorised to view actual results.</p>
+{% endif %}
+<p {% if authorised -%} class="note" {%- endif %}>Votes received from {{gr.voters}} people</p>
 
 </div>
 {% endfor %}
