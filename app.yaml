@@ -10,11 +10,11 @@ handlers:
 
 - url: /favicon\.ico
   static_files: static/icons/favicon.ico
-  upload: static\/icons\/favicon\.ico
+  upload: static/icons/favicon\.ico
 
 - url: /browserconfig\.xml
   static_files: static/icons/browserconfig.xml
-  upload: static\/icons\/browserconfig\.xml
+  upload: static/icons/browserconfig\.xml
 
 - url: /worker.*
   script: src.worker.app
