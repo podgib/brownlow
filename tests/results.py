@@ -219,5 +219,74 @@ class TwoMatchTestCase(unittest.TestCase):
   def tearDown(self):
     self.testbed.deactivate()
 
+class WeightedTestCase(unittest.TestCase):
+  def setUp(self):
+    self.testbed = testbed.Testbed()
+    self.testbed.activate()
+    self.testbed.init_datastore_v3_stub()
+    self.testbed.init_memcache_stub()
+
+    self.g1 = \
+      Game(opponent='test', date=datetime.date(2015, 10, 01), venue='test', team=Team.TEST, weight=0.4)
+    self.g2 = \
+      Game(opponent='test', date=datetime.date(2015, 11, 01), venue='test', team=Team.TEST, weight=0.6)
+
+    players = []
+    for i in range(0, 10):
+      p = Player(name='Player ' + str(i))
+      p.put()
+      players.append(p)
+
+    self.g1.players = [p.key for p in players]
+    self.g1.put()
+
+    self.g2.players = [p.key for p in players]
+    self.g2.put()
+
+    v = Vote(game=self.g1.key, three=players[7].key, two=players[9].key, one=players[3].key)
+    v.put()
+    v = Vote(game=self.g2.key, three=players[9].key, two=players[7].key, one=players[3].key)
+    v.put()
+
+  def testGameResults(self):
+    results = game_results(self.g1)
+
+    self.assertEqual('Player 7', results.three.get().name)
+    self.assertEqual('Player 9', results.two.get().name)
+    self.assertEqual('Player 3', results.one.get().name)
+    self.assertEqual(1, results.voters)
+
+    results = game_results(self.g2)
+    self.assertEqual('Player 9', results.three.get().name)
+    self.assertEqual('Player 7', results.two.get().name)
+    self.assertEqual('Player 3', results.one.get().name)
+    self.assertEqual(1, results.voters)
+
+  def testOverallResults(self):
+    results = overall_results(Team.TEST)
+
+    # Overall rankings
+    self.assertEqual('Player 9', results.player_votes[0].player.get().name)
+    self.assertEqual('Player 7', results.player_votes[1].player.get().name)
+    self.assertEqual('Player 3', results.player_votes[2].player.get().name)
+    self.assertAlmostEqual(2.6, results.player_votes[0].total, places=3)
+    self.assertAlmostEqual(2.4, results.player_votes[1].total, places=3)
+    self.assertAlmostEqual(1.0, results.player_votes[2].total, places=3)
+
+    # Game 1
+    self.assertEqual('Player 7', results.game_votes[0].three.get().name)
+    self.assertEqual('Player 9', results.game_votes[0].two.get().name)
+    self.assertEqual('Player 3', results.game_votes[0].one.get().name)
+    self.assertEqual(1, results.game_votes[0].voters)
+
+    # Game 2
+    self.assertEqual('Player 9', results.game_votes[1].three.get().name)
+    self.assertEqual('Player 7', results.game_votes[1].two.get().name)
+    self.assertEqual('Player 3', results.game_votes[1].one.get().name)
+    self.assertEqual(1, results.game_votes[1].voters)
+
+  def tearDown(self):
+    self.testbed.deactivate()
+
 if __name__ == '__main__':
   unittest.main()

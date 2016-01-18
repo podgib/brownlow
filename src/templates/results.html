@@ -11,7 +11,7 @@
 <table class="results">
     <tr><th></th><th>Name</th><th>Votes</th></tr>
     {% for pr in results.player_votes %}
-    <tr><td>{{loop.index}}.</td><td>{{pr.player.get().name}}</td><td>{{pr.total()}}</td></tr>
+    <tr><td>{{loop.index}}.</td><td>{{pr.player.get().name}}</td><td>{{pr.total}}</td></tr>
     {% endfor %}
 </table>
 {% else %}
@@ -32,6 +32,7 @@
 {% else %}
 <p>You are not authorised to view actual results.</p>
 {% endif %}
+{% if game.weight != 1 %}<p class="note">Votes for this game weighted by {{ game.weight }}</p>{%  endif %}
 <p {% if authorised -%} class="note" {%- endif %}>Votes received from {{gr.voters}} people</p>
 
 </div>

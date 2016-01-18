@@ -94,6 +94,7 @@ class EditGameHandler(webapp2.RequestHandler):
     venue = self.request.get("venue")
     player_id_strings = self.request.get_all("players")
     team = Team.getTeam(self.request.get("team"))
+    weight = float(self.request.get("weight"))
 
     date_tokens = date_string.split("/")
     if len(date_tokens) == 1:
@@ -106,6 +107,7 @@ class EditGameHandler(webapp2.RequestHandler):
     game.date = date
     game.venue = venue
     game.team = team
+    game.weight = weight
     player_keys = [ndb.Key('Player', int(pid)) for pid in player_id_strings]
     game.players = player_keys
     game.put()
@@ -128,6 +130,7 @@ class AddGameHandler(webapp2.RequestHandler):
     venue = self.request.get("venue")
     player_id_strings = self.request.get_all("players")
     team = Team.getTeam(self.request.get("team"))
+    weight = float(self.request.get("weight"))
 
     date_tokens = date_string.split("/")
     if len(date_tokens) == 1:
@@ -136,7 +139,7 @@ class AddGameHandler(webapp2.RequestHandler):
       date_tokens.reverse()
     date = datetime.date(int(date_tokens[0]), int(date_tokens[1]), int(date_tokens[2]))
 
-    game = Game(opponent=opponent, date=date, venue=venue, team=team)
+    game = Game(opponent=opponent, date=date, venue=venue, team=team, weight=weight)
     player_keys = [ndb.Key('Player', int(pid)) for pid in player_id_strings]
     game.players = player_keys
     game.put()

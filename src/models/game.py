@@ -38,6 +38,7 @@ class Game(ndb.Model):
   venue = ndb.StringProperty(required=True)
   team = ndb.IntegerProperty(required=True)
   players = ndb.KeyProperty(kind=Player, repeated=True)
+  weight = ndb.FloatProperty(required=True, default=1.0)
 
 class GameResults(ndb.Model):
   game = ndb.KeyProperty(kind=Game, required=True)

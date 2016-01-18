@@ -64,18 +64,24 @@ def overall_results(team):
 
     if player_votes.has_key(results.three):
       player_votes[results.three].threes +=1
+      player_votes[results.three].total += 3 * game.weight
     else:
-      player_votes[results.three] = PlayerOverallVotes(player=results.three, threes=1)
+      player_votes[results.three] = \
+        PlayerOverallVotes(player=results.three, threes=1, total=3*game.weight)
 
     if player_votes.has_key(results.two):
       player_votes[results.two].twos +=1
+      player_votes[results.two].total +=2 * game.weight
     else:
-      player_votes[results.two] = PlayerOverallVotes(player=results.two, twos=1)
+      player_votes[results.two] = \
+        PlayerOverallVotes(player=results.two, twos=1, total=2*game.weight)
 
     if player_votes.has_key(results.one):
       player_votes[results.one].ones +=1
+      player_votes[results.one].total +=1 * game.weight
     else:
-      player_votes[results.one] = PlayerOverallVotes(player=results.one, ones=1)
+      player_votes[results.one] = \
+        PlayerOverallVotes(player=results.one, ones=1, total=game.weight)
 
     game_votes.append(results)
 
