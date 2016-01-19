@@ -1,6 +1,7 @@
 import base64
 import webapp2
 import os
+import re
 import jinja2
 import logging
 import datetime
@@ -35,12 +36,13 @@ class AddPlayerHandler(webapp2.RequestHandler):
       errmsg = "You didn't supply an email"
     elif self.request.get("err") == str(ERROR_ALREADY_EXISTS):
       errmsg = "A player with that name already exists"
-    template = jinja_environment.get_template("templates/add_player.html")
+    template = jinja_environment.get_template("templates/add_edit_player.html")
     self.response.out.write(template.render({'errmsg':errmsg}))
 
   def post(self):
     name = self.request.get("name")
     email = self.request.get("email")
+    phone = self.request.get("phone")
     if not name:
       self.redirect("http://vote.ouarfc.co.uk/admin/add_player?err=" + str(ERROR_NO_NAME))
       return
@@ -52,6 +54,13 @@ class AddPlayerHandler(webapp2.RequestHandler):
       return
 
     player = Player(name=name, email=email)
+    if phone:
+      # Remove special characters
+      phone = re.sub('[\s+=\-.]','',phone)
+      # Place UK area code at start
+      phone = re.sub('^0','44', phone)
+      if phone.isdigit():
+        player.phone = phone
     player.put()
 
     template = jinja_environment.get_template("templates/player_added.html")
