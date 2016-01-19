@@ -125,6 +125,8 @@ class EditPlayerHandler(webapp2.RequestHandler):
         self.redirect(
           "http://vote.ouarfc.co.uk/admin/edit_player/" + str(player_id) + "?err=" + str(ERROR_INVALID_PHONE))
         return
+    else:
+      player.phone = None
 
     player.name = name
     player.email = email
