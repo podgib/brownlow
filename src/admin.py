@@ -308,6 +308,21 @@ class ResultsHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/results.html")
     self.response.out.write(template.render(params))
 
+class VotersHandler(webapp2.RequestHandler):
+  def get(self, game_id):
+    game = Game.get_by_id(int(game_id))
+    if not game:
+      self.response.out.write("Error: invalid game ID")
+      logging.error("Invalid game ID: " + str(game_id))
+      return
+
+    voters = Token.query(ndb.AND(Token.game == game.key, Token.used == True)).fetch(100)
+    non_voters = Token.query(ndb.AND(Token.game == game.key, Token.used == False)).fetch(100)
+
+    template = jinja_environment.get_template('templates/voters.html')
+    params = {'voters':voters,'non_voters':non_voters,'game':game}
+    self.response.out.write(template.render(params))
+
 
 class MenuHandler(webapp2.RequestHandler):
   def get(self):
@@ -333,5 +348,6 @@ app = webapp2.WSGIApplication([
   webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler),
   ('/admin/results', ResultsMenuHandler),
   webapp2.Route('/admin/results/<team_name>', handler=ResultsHandler),
+  webapp2.Route('/admin/voters/<game_id>', handler=VotersHandler),
   ('/admin',MenuHandler), ('/admin/', MenuHandler)
 ], debug=True)

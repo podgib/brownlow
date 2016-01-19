@@ -20,6 +20,7 @@
 
 {% for gr in results.game_votes %}
 {% set game = gr.game.get() %}
+<a href="/admin/voters/{{ game.key.id() }}">
 <div class="game-results">
 <h2 class="results">Game {{loop.index}}</h2>
 <h3 class="results">Oxford vs {{game.opponent}}</h3>
@@ -36,6 +37,7 @@
 <p {% if authorised -%} class="note" {%- endif %}>Votes received from {{gr.voters}} people</p>
 
 </div>
+</a>
 {% endfor %}
 
 {% endif %}
