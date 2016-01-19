@@ -9,6 +9,7 @@ import json
 from google.appengine.api import taskqueue
 from google.appengine.api import mail
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 from models.player import Player
 from models.game import Game
@@ -62,11 +63,20 @@ class EmailHandler(webapp2.RequestHandler):
     player = Player.get_by_id(int(player_id))
     game = Game.get_by_id(int(game_id))
 
-    token_string = base64.urlsafe_b64encode(os.urandom(16))
-    token = Token(value=token_string, voter=player.key, game=game.key, used=False)
-    token.put()
+    token = Token.query(ndb.AND(Token.game == game.key, Token.voter == player.key)).get()
 
-    url = "http://vote.ouarfc.co.uk/vote/" + token_string
+    if not token:
+      logging.info("No token found for %s. Creating new token.", player.name)
+      token_string = base64.urlsafe_b64encode(os.urandom(16))
+      token = Token(value=token_string, voter=player.key, game=game.key, used=False)
+      token.put()
+    else:
+      logging.info("Token found for %s.", player.name)
+      if token.used:
+        logging.info("%s has already voted, not sending email.", player.name)
+        return
+
+    url = "http://vote.ouarfc.co.uk/vote/" + token.value
 
     if (player.phone):
       logging.info('Sending SMS to %s', player.name)
