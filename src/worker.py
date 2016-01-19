@@ -58,7 +58,7 @@ class EmailHandler(webapp2.RequestHandler):
     player = Player.get_by_id(int(player_id))
     game = Game.get_by_id(int(game_id))
 
-    token_string = base64.urlsafe_b64encode(os.urandom(32))
+    token_string = base64.urlsafe_b64encode(os.urandom(16))
     token = Token(value=token_string, voter=player.key, game=game.key, used=False)
     token.put()
 

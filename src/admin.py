@@ -171,7 +171,7 @@ class GenerateTokenHandler(webapp2.RequestHandler):
     voter = Player.get_by_id(int(voter_id))
     game = Game.get_by_id(int(game_id))
 
-    value = base64.urlsafe_b64encode(os.urandom(32))
+    value = base64.urlsafe_b64encode(os.urandom(16))
     token = Token(value=value, voter=voter.key, game=game.key, used=False)
     token.put()
     url = "http://vote.ouarfc.co.uk/vote/" + value
