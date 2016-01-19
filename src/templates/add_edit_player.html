@@ -1,7 +1,7 @@
 {% extends 'templates/layout.html' %}
 
 {% block content %}
-<h1>Add a player</h1>
+<h1>{%- if player -%}Edit{%- else -%}Add a{%- endif %} player</h1>
 
 {% if errmsg %}
 <p class="error">Error: {{errmsg}}</p>
