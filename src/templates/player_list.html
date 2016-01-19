@@ -1,0 +1,11 @@
+{% extends 'templates/layout.html' %}
+
+{% block content %}
+    <h1>Edit Player</h1>
+    <ul>
+        {% for p in players -%}
+            <li><a href="/admin/edit_player/{{p.key.id()}}">{{ p.name }}</a></li>
+        {%- endfor %}
+    </ul>
+
+{% endblock content %}

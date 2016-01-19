@@ -7,13 +7,17 @@
 <p class="error">Error: {{errmsg}}</p>
 {% endif %}
 
-<form method="POST" action="/admin/add_player">
+<form method="POST" action="/admin/{%- if player -%}edit_player{%- else -%}add_player{%- endif -%}">
+    {% if player %}<input type="hidden" name="player_id" id="player_id" value="{{ player.key.id() }}">{% endif %}
     <label for="name">Name: </label><br>
-    <input type="text" name="name" id="name" placeholder="e.g. Wande McCunn"><br>
+    <input type="text" name="name" id="name" placeholder="e.g. Wande McCunn"
+           {%- if player %} value="{{ player.name }}"{% endif %}><br>
     <label for="email">Email: </label><br>
-    <input type="email" name="email" id="email" placeholder="example@example.com"><br>
+    <input type="email" name="email" id="email" placeholder="example@example.com"
+           {%- if player %} value="{{ player.email }}"{% endif %}><br>
     <label for="phone">Mobile: </label><br>
-    <input type="tel" name="phone" placeholder="44xxxxxxxx"><br>
-    <input type="submit" name="add" value="Add"><br>
+    <input type="tel" name="phone" placeholder="44xxxxxxxx"
+           {%- if player and player.phone %} value="{{ player.phone }}"{% endif %}><br>
+    <input type="submit" name="add" value={%- if player -%}"Save"{%- else -%}"Add"{%- endif -%}><br>
 </form>
 {% endblock content %}

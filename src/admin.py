@@ -23,6 +23,7 @@ jinja_environment.filters['teamString'] = Team.getString
 ERROR_NO_NAME = 1280
 ERROR_ALREADY_EXISTS = 1281
 ERROR_NO_EMAIL = 1282
+ERROR_INVALID_PHONE = 1283
 
 mens_results_viewers = ['kyleturner24@gmail.com', 'eugene.duff@gmail.com']
 womens_results_viewers = ['rachel.louise.paterson@gmail.com']
@@ -36,6 +37,8 @@ class AddPlayerHandler(webapp2.RequestHandler):
       errmsg = "You didn't supply an email"
     elif self.request.get("err") == str(ERROR_ALREADY_EXISTS):
       errmsg = "A player with that name already exists"
+    elif self.request.get("err") == str(ERROR_INVALID_PHONE):
+      errmsg = "Invalid phone number"
     template = jinja_environment.get_template("templates/add_edit_player.html")
     self.response.out.write(template.render({'errmsg':errmsg}))
 
@@ -64,6 +67,70 @@ class AddPlayerHandler(webapp2.RequestHandler):
     player.put()
 
     template = jinja_environment.get_template("templates/player_added.html")
+    self.response.out.write(template.render({'name':name}))
+
+class EditPlayerHandler(webapp2.RequestHandler):
+  def get(self, player_id=None):
+    if not player_id:
+      template = jinja_environment.get_template("templates/player_list.html")
+      players = Player.query().order(Player.name).fetch(1000)
+      self.response.out.write(template.render({'players':players}))
+      return
+
+    errmsg = None
+    if self.request.get("err") == str(ERROR_NO_NAME):
+      errmsg = "You didn't supply a name"
+    elif self.request.get("err") == str(ERROR_NO_EMAIL):
+      errmsg = "You didn't supply an email"
+    elif self.request.get("err") == str(ERROR_INVALID_PHONE):
+      errmsg = "Invalid phone number"
+
+    player = Player.get_by_id(int(player_id))
+    if not player:
+      self.response.out.write("Error: invalid player ID")
+      logging.error("Invalid player ID: " + str(player_id))
+
+    template = jinja_environment.get_template("templates/add_edit_player.html")
+    self.response.out.write(template.render({'player':player, 'errmsg':errmsg}))
+
+  def post(self):
+    player_id = self.request.get("player_id")
+    player = Player.get_by_id(int(player_id))
+    if not player:
+      self.response.out.write("Error: invalid player ID")
+      logging.error("Invalid player ID: " + str(player_id))
+
+    name = self.request.get("name")
+    email = self.request.get("email")
+    phone = self.request.get("phone")
+
+    if not name:
+      self.redirect(
+          "http://vote.ouarfc.co.uk/admin/edit_player/" + str(player_id) + "?err=" + str(ERROR_NO_NAME))
+      return
+
+    if not email:
+      self.redirect(
+          "http://vote.ouarfc.co.uk/admin/edit_player/" + str(player_id) + "?err=" + str(ERROR_NO_EMAIL))
+      return
+
+    if phone:
+      # Remove special characters
+      phone = re.sub('[\s+=\-.]','',phone)
+      # Place UK area code at start
+      phone = re.sub('^0','44', phone)
+      if phone.isdigit():
+        player.phone = phone
+      else:
+        self.redirect(
+          "http://vote.ouarfc.co.uk/admin/edit_player/" + str(player_id) + "?err=" + str(ERROR_INVALID_PHONE))
+        return
+
+    player.name = name
+    player.email = email
+    player.put()
+
+    template = jinja_environment.get_template("templates/player_saved.html")
     self.response.out.write(template.render({'name':name}))
 
 class EditGameHandler(webapp2.RequestHandler):
@@ -257,6 +324,8 @@ class ResultsMenuHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
   webapp2.Route('/admin/add_player', handler=AddPlayerHandler),
   webapp2.Route('/admin/add_game', handler=AddGameHandler),
+  webapp2.Route('/admin/edit_player', handler=EditPlayerHandler),
+  webapp2.Route('/admin/edit_player/<player_id>', handler=EditPlayerHandler),
   webapp2.Route('/admin/edit_game', handler=EditGameHandler),
   webapp2.Route('/admin/edit_game/<game_id>', handler=EditGameHandler),
   webapp2.Route('/admin/generate_token', handler=GenerateTokenHandler),
