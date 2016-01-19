@@ -3,15 +3,19 @@ import logging
 import jinja2
 import webapp2
 import os
+import urllib
+import json
 
 from google.appengine.api import taskqueue
 from google.appengine.api import mail
+from google.appengine.api import urlfetch
 
 from models.player import Player
 from models.game import Game
 from models.game import Team
 from models.token import Token
 from models.vote import SelfVote
+import config
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -64,15 +68,44 @@ class EmailHandler(webapp2.RequestHandler):
 
     url = "http://vote.ouarfc.co.uk/vote/" + token_string
 
+    if (player.phone):
+      logging.info('Sending SMS to %s', player.name)
+      template = jinja_environment.get_template('templates/sms.txt')
+      sms_data = {
+        'ORIGINATOR':'OUARFC',
+        'NUMBERS':player.phone,
+        'BODY':template.render({'url':url, 'opponent':game.opponent, 'team':Team.getString(game.team)})
+      }
+
+      response = urlfetch.fetch('https://api.zensend.io/v3/sendsms', payload=urllib.urlencode(sms_data),
+                                method=urlfetch.POST, headers={"X-API-KEY": config.zensend_key})
+      content_type = response.headers['content-type']
+      if content_type is not None and "application/json" in content_type:
+        result = json.loads(response.content)
+        if "success" in result:
+          logging.info("Successfully sent SMS to " + player.phone)
+          if config.phone_only:
+            # SMS was a success, don't send email
+            return
+        elif "failure" in result:
+          failure = result["failure"]
+          logging.error("SMS send failed. Player: %s, phone: %s, parameter: %s, error code: %s, status code: %s",
+                        player.name, player.phone, failure["parameter"], failure["failcode"], response.status_code)
+        else:
+          logging.error("SMS send failed. Status code: %s", response.status_code)
+      else:
+        logging.error("SMS send failed. Status code: %s", response.status_code)
+
     template = jinja_environment.get_template('templates/email.txt')
     subject = "OUARFC: Please Vote For Best & Fairest"
     message = mail.EmailMessage(sender="OUARFC <vote@ouarfc-vote.appspotmail.com>", subject=subject)
     message.to = player.email
     message.body = template.render(
-      {'name':player.name, 'opponent':game.opponent, 'date':game.date, 'team': Team.getString(game.team), 'url':url})
+        {'name':player.name, 'opponent':game.opponent, 'date':game.date, 'team': Team.getString(game.team), 'url':url})
     logging.info("Sending email to " + player.email)
     message.send()
     logging.info(message.body)
+
 
 app = webapp2.WSGIApplication(
   [ ('/worker/email', EmailHandler),

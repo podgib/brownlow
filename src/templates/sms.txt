@@ -1,0 +1,4 @@
+Please submit your votes for Oxford {{team}} vs {{opponent}}.
+Your unique voting link:
+{{url}}
+
