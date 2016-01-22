@@ -29,19 +29,19 @@
     </select><br>
     <label for="weight">Weight: </label><br>
     <input type="number" step="0.1" name="weight" id="weight" value="{%- if game -%}{{ game.weight }}{%- else -%}1.0{%- endif -%}"><br>
-    <br>
+    <p>Choose Players: (<span id="player-count">{{ playing | length }}</span> selected)</p>
     {% for p in players %}
-    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}">
+    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}" onchange="updateCount()">
     <label for="{{p.key.id()}}">{{p.name}}</label>
     <br>
     {% endfor %}
     {% for p in playing %}
-    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}" checked>
+    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}" checked onchange="updateCount()">
     <label for="{{p.key.id()}}">{{p.name}}</label>
     <br>
     {% endfor %}
     {% for p in not_playing %}
-    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}">
+    <input type="checkbox" name="players" id="{{p.key.id()}}" value="{{p.key.id()}}" onchange="updateCount()">
     <label for="{{p.key.id()}}">{{p.name}}</label>
     <br>
     {% endfor %}
@@ -52,5 +52,17 @@
     <input type="submit" name="add" value="Add">
     {% endif %}
 </form>
-
+<script type="text/javascript">
+var players = document.getElementsByName('players');
+var count = document.getElementById('player-count');
+function updateCount() {
+    var n = 0;
+    for (var i = 0; i < players.length; i++) {
+       if (players[i].checked) {
+           n++;
+       }
+    }
+    count.textContent = n;
+}
+</script>
 {% endblock %}
