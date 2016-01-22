@@ -48,6 +48,7 @@
     {% if game %}
     <input type="hidden" name="game_id" value="{{game.key.id()}}">
     <input type="submit" name="save" value="save">
+    <input type="submit" name="delete" value="delete" onclick="return confirm('Do you really want to delete this game?');">
     {% else %}
     <input type="submit" name="add" value="Add">
     {% endif %}

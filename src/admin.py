@@ -14,6 +14,7 @@ from models.player import Player
 from models.game import Game
 from models.game import Team
 from models.token import Token
+from models.vote import Vote, SelfVote
 
 from results import game_results, overall_results, OverallResults
 
@@ -167,6 +168,12 @@ class EditGameHandler(webapp2.RequestHandler):
       logging.error("Invalid game ID: " + str(game_id))
       return
 
+    if self.request.get("delete"):
+      self.delete_game(game)
+      template = jinja_environment.get_template("templates/game_deleted.html")
+      self.response.out.write(template.render())
+      return
+
     opponent = self.request.get("opponent")
     date_string = self.request.get("date")
     venue = self.request.get("venue")
@@ -192,6 +199,16 @@ class EditGameHandler(webapp2.RequestHandler):
 
     template = jinja_environment.get_template("templates/game_saved.html")
     self.response.out.write(template.render({}))
+
+  def delete_game(self, game):
+    tokens = Token.query(Token.game == game.key)
+    keys = [token.key for token in tokens]
+    votes = Vote.query(Vote.game == game.key)
+    keys.extend([vote.key for vote in votes])
+    votes = SelfVote.query(SelfVote.game == game.key)
+    keys.extend([vote.key for vote in votes])
+    ndb.delete_multi_async(keys)
+    game.key.delete()
 
 
 class AddGameHandler(webapp2.RequestHandler):
