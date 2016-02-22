@@ -64,6 +64,7 @@ class EmailHandler(webapp2.RequestHandler):
     game = Game.get_by_id(int(game_id))
 
     token = Token.query(ndb.AND(Token.game == game.key, Token.voter == player.key)).get()
+    reminder = False
 
     if not token:
       logging.info("No token found for %s. Creating new token.", player.name)
@@ -72,13 +73,14 @@ class EmailHandler(webapp2.RequestHandler):
       token.put()
     else:
       logging.info("Token found for %s.", player.name)
+      reminder = True
       if token.used:
         logging.info("%s has already voted, not sending email.", player.name)
         return
 
     url = "http://vote.ouarfc.co.uk/vote/" + token.value
 
-    if (player.phone):
+    if player.phone and not reminder:
       logging.info('Sending SMS to %s', player.name)
       template = jinja_environment.get_template('templates/sms.txt')
       sms_data = {
@@ -108,6 +110,8 @@ class EmailHandler(webapp2.RequestHandler):
 
     template = jinja_environment.get_template('templates/email.txt')
     subject = "OUARFC: Please Vote For Best & Fairest"
+    if reminder:
+      subject = "Reminder - " + subject
     message = mail.EmailMessage(sender="OUARFC <vote@ouarfc-vote.appspotmail.com>", subject=subject)
     message.to = player.email
     message.body = template.render(
