@@ -117,6 +117,13 @@ class ResultsHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/results.html")
     self.response.out.write(template.render(params))
 
+class ResultsMenuHandler(webapp2.RequestHandler):
+  def get(self):
+    teams = Team.getAll()[:-1]
+    template = jinja_environment.get_template("templates/results_menu.html")
+    self.response.out.write(template.render({'teams': teams, 'public': True}))
+
 app = webapp2.WSGIApplication([
   webapp2.Route('/results/<team_name>', handler=ResultsHandler),
+  ('/results', ResultsMenuHandler),
 ], debug=True)
