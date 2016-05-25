@@ -34,7 +34,9 @@
 <p>You are not authorised to view actual results.</p>
 {% endif %}
 {% if game.weight != 1 %}<p class="note">Votes for this game weighted by {{ game.weight }}</p>{%  endif %}
+{% if not hide_count -%}
 <p {% if authorised -%} class="note" {%- endif %}>Votes received from {{gr.voters}} people</p>
+{%- endif %}
 
 </div>
 </a>

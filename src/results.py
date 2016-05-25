@@ -10,8 +10,12 @@ from models.game import Team
 from models.game import Game
 from models.game import GameResults
 from models.vote import Vote
+from models.season import Season
 from models.vote import PlayerGameVotes, PlayerOverallVotes
 from models.player import Player
+
+jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+jinja_environment.filters['teamString'] = Team.getString
 
 def game_results(game):
   votes = Vote.query(Vote.game == game.key).fetch(1000)
@@ -52,8 +56,8 @@ class OverallResults:
     self.player_votes = player_votes
     self.game_votes = game_votes
 
-def overall_results(team):
-  games = Game.query(Game.team == team).order(Game.date).fetch(100)
+def overall_results(team, rounds = 100):
+  games = Game.query(Game.team == team).order(Game.date).fetch(rounds)
   game_votes = []
   player_votes = {}
 
@@ -87,3 +91,32 @@ def overall_results(team):
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
   return OverallResults(player_votes=[r[1] for r in sorted_votes], game_votes=game_votes)
+
+class ResultsHandler(webapp2.RequestHandler):
+
+  def get(self, team_name):
+    team = Team.getTeam(team_name)
+    if not team:
+      template = jinja_environment.get_template("templates/error.html")
+      self.response.out.write(template.render({'errmsg':'Invalid team: ' + team_name}))
+      return
+
+    season = Season.query().get()
+    if not season:
+      season = Season(public_round=0)
+      season.put()
+
+    if season.public_round > 0:
+      results = overall_results(team, season.public_round)
+    else:
+      results = None
+
+    authorised = True
+
+    params = {'team':team, 'results':results, 'authorised':True, 'hide_count':True}
+    template = jinja_environment.get_template("templates/results.html")
+    self.response.out.write(template.render(params))
+
+app = webapp2.WSGIApplication([
+  webapp2.Route('/results/<team_name>', handler=ResultsHandler),
+], debug=True)

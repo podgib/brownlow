@@ -24,6 +24,9 @@ handlers:
   script: src.admin.app
   login: admin
 
+- url: /results.*
+  script: src.results.app
+
 - url: .*
   script: src.vote.app
 
