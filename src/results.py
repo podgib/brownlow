@@ -103,15 +103,15 @@ class ResultsHandler(webapp2.RequestHandler):
 
     season = Season.query().get()
     if not season:
-      season = Season(public_round=0)
+      season = Season(public_round=[0 for t in Team.getAll()])
       season.put()
 
-    if season.public_round > 0:
-      results = overall_results(team, season.public_round)
+    round = season.public_round[team - 1]
+
+    if round > 0:
+      results = overall_results(team, round)
     else:
       results = None
-
-    authorised = True
 
     params = {'team':team, 'results':results, 'authorised':True, 'hide_count':True}
     template = jinja_environment.get_template("templates/results.html")
