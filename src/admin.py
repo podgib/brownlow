@@ -15,6 +15,7 @@ from models.game import Game
 from models.game import Team
 from models.token import Token
 from models.vote import Vote, SelfVote
+from models.season import Season
 
 from results import game_results, overall_results, OverallResults
 
@@ -342,6 +343,31 @@ class VotersHandler(webapp2.RequestHandler):
     params = {'voters':voters,'non_voters':non_voters,'game':game}
     self.response.out.write(template.render(params))
 
+class PublicResultsHandler(webapp2.RequestHandler):
+  def get(self):
+    teams = Team.getAll()
+    season = Season.query().get()
+    template = jinja_environment.get_template("templates/results_rounds.html")
+    self.response.out.write(template.render({'teams': teams, 'season': season}))
+
+  def post(self):
+    teams = Team.getAll()
+    season = Season.query().get()
+
+    for team in teams:
+      round = int(self.request.get(team.lower()))
+      idx = Team.getTeam(team)
+      if idx < 0:
+        idx = idx % len(teams)
+      else:
+        idx = idx - 1
+      season.public_round[idx] = round
+
+    season.put()
+
+    template = jinja_environment.get_template("templates/results_rounds.html")
+    self.response.out.write(template.render({'teams': teams, 'season': season}))
+
 
 class MenuHandler(webapp2.RequestHandler):
   def get(self):
@@ -366,6 +392,7 @@ app = webapp2.WSGIApplication([
   webapp2.Route('/admin/send_emails', handler=EmailHandler),
   webapp2.Route('/admin/send_emails/<game_id>', handler=EmailHandler),
   ('/admin/results', ResultsMenuHandler),
+  ('/admin/results/public', PublicResultsHandler),
   webapp2.Route('/admin/results/<team_name>', handler=ResultsHandler),
   webapp2.Route('/admin/voters/<game_id>', handler=VotersHandler),
   ('/admin',MenuHandler), ('/admin/', MenuHandler)

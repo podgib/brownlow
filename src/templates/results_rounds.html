@@ -1,0 +1,17 @@
+{% extends 'templates/layout.html' %}
+
+{% block content %}
+
+<h1>Public Results</h1>
+<p>Enter round to show results for:</p>
+
+<form method="POST" action="/admin/results/public">
+{%  for t in teams %}
+  {% set round = season.public_round[loop.index0] %}
+  <label for="{{ t | lower }}">{{ t }}:</label><br>
+  <input type="text" name="{{ t | lower }}" id="{{ t | lower }}" value="{{ round }}">
+  <br>
+{%  endfor %}
+<input type="submit" value="Update">
+</form>
+{% endblock %}
