@@ -17,7 +17,16 @@ from models.player import Player
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 jinja_environment.filters['teamString'] = Team.getString
 
+@ndb.transactional
+def cache_results(results):
+  if GameResults.query(ancestor=results.game).count() == 0:
+    results.put()
+
 def game_results(game):
+  cached_results = GameResults.query(ancestor=game.key).get()
+  if cached_results:
+    return cached_results
+
   votes = Vote.query(Vote.game == game.key).fetch(1000)
 
   player_votes = {}
@@ -47,7 +56,9 @@ def game_results(game):
 
   sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
   players = [sorted_votes[0][0], sorted_votes[1][0], sorted_votes[2][0]]
-  result = GameResults(game=game.key, three=players[0], two=players[1], one=players[2], voters=len(votes))
+  result = GameResults(parent=game.key, game=game.key, three=players[0], two=players[1], one=players[2], voters=len(votes))
+
+  cache_results(result)
 
   return result
 

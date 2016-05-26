@@ -11,7 +11,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 from models.player import Player
-from models.game import Game
+from models.game import Game, GameResults
 from models.game import Team
 from models.token import Token
 from models.vote import Vote, SelfVote
@@ -208,6 +208,8 @@ class EditGameHandler(webapp2.RequestHandler):
     keys.extend([vote.key for vote in votes])
     votes = SelfVote.query(SelfVote.game == game.key)
     keys.extend([vote.key for vote in votes])
+    results = GameResults.query(GameResults.game == game.key)
+    keys.extend([result.key for result in results])
     ndb.delete_multi_async(keys)
     game.key.delete()
 

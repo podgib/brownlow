@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import mail
 
 from models.game import Team
+from models.game import GameResults
 from models.player import Player
 from models.vote import Vote
 from models.token import Token
@@ -80,6 +81,10 @@ class VoteHandler(webapp2.RequestHandler):
 
     vote.put()
     token.put()
+
+    cached_results = GameResults.query(GameResults.game == game).fetch()
+    for r in cached_results:
+      r.delete()
 
     template = jinja_environment.get_template('templates/success.html')
     self.response.out.write(template.render({}))
