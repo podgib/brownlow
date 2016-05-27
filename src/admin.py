@@ -28,7 +28,7 @@ ERROR_NO_EMAIL = 1282
 ERROR_INVALID_PHONE = 1283
 
 mens_results_viewers = ['kyleturner24@gmail.com', 'eugene.duff@gmail.com']
-womens_results_viewers = ['rachel.louise.paterson@gmail.com']
+womens_results_viewers = ['kyleturner24@gmail.com', 'eugene.duff@gmail.com']
 
 class AddPlayerHandler(webapp2.RequestHandler):
   def get(self):
