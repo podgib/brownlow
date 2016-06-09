@@ -44,4 +44,36 @@
 
 {% endif %}
 
+{% if refresh -%}
+
+    <script type="text/javascript">
+    var team = '{{ team_name }}';
+    var current_round = {{ round }};
+    function checkRound() {
+        if (window.XMLHttpRequest) {
+            request = new XMLHttpRequest();
+            request.open("GET", "/results/round", true);
+            request.onreadystatechange = function() {
+                if (request.readyState == 4 && request.status == 200) {
+                    json = JSON.parse(request.response);
+                    round = json[team];
+                    if (round != current_round) {
+                        window.location.reload();
+                    }
+                    else {
+                        setTimer();
+                    }
+                }
+            };
+            request.send();
+        }
+    }
+    function setTimer() {
+        window.setTimeout(checkRound, 20000);
+    }
+    window.onload = setTimer;
+    </script>
+
+{%-  endif %}
+
 {% endblock %}

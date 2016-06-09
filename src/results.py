@@ -3,6 +3,7 @@ import jinja2
 import logging
 import operator
 import webapp2
+import json
 
 from google.appengine.ext import ndb
 
@@ -124,7 +125,8 @@ class ResultsHandler(webapp2.RequestHandler):
     else:
       results = None
 
-    params = {'team':team, 'results':results, 'authorised':True, 'hide_count':True}
+    params = {'team':team, 'team_name': Team.getString(team), 'round': round, 'results':results, 'authorised':True,
+              'hide_count':True, 'refresh': True}
     template = jinja_environment.get_template("templates/results.html")
     self.response.out.write(template.render(params))
 
@@ -134,7 +136,17 @@ class ResultsMenuHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/results_menu.html")
     self.response.out.write(template.render({'teams': teams, 'public': True}))
 
+class RoundHandler(webapp2.RequestHandler):
+  def get(self):
+    season = Season.query().get()
+    data = {}
+    for team in Team.getAll():
+      data[team] = season.get_public_round(team)
+    self.response.out.write(json.dumps(data))
+    self.response.content_type = 'application/json'
+
 app = webapp2.WSGIApplication([
+  ('/results/round', RoundHandler),
   webapp2.Route('/results/<team_name>', handler=ResultsHandler),
   ('/results', ResultsMenuHandler),
 ], debug=True)
