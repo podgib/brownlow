@@ -9,7 +9,7 @@
 {%  for t in teams %}
   {% set round = season.public_round[loop.index0] %}
   <label for="{{ t | lower }}">{{ t }}:</label><br>
-  <input type="text" name="{{ t | lower }}" id="{{ t | lower }}" value="{{ round }}">
+  <input type="number" step="1" name="{{ t | lower }}" id="{{ t | lower }}" value="{{ round }}">
   <br>
 {%  endfor %}
 <input type="submit" value="Update">
