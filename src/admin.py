@@ -141,7 +141,7 @@ class EditGameHandler(webapp2.RequestHandler):
   def get(self, game_id=None):
     if not game_id:
       template = jinja_environment.get_template("templates/game_list.html")
-      games = Game.query().order(Game.date).fetch(100)
+      games = Game.query().order(Game.date).fetch(1000)
       self.response.out.write(template.render({'games':games}))
       return
 
@@ -153,7 +153,7 @@ class EditGameHandler(webapp2.RequestHandler):
 
     teams = Team.getAll();
 
-    players = Player.query().order(Player.name).fetch(100)
+    players = Player.query().order(Player.name).fetch(1000)
     playing = [p for p in players if p.key in game.players]
     not_playing = [p for p in players if p.key not in game.players]
 
