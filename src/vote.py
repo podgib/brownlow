@@ -84,7 +84,7 @@ class VoteHandler(webapp2.RequestHandler):
 
     cached_results = GameResults.query(GameResults.game == game).fetch()
     for r in cached_results:
-      r.delete()
+      r.key.delete()
 
     template = jinja_environment.get_template('templates/success.html')
     self.response.out.write(template.render({}))
