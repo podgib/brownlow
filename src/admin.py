@@ -280,7 +280,7 @@ class EmailHandler(webapp2.RequestHandler):
       logging.error("Invalid game ID: " + str(game_id))
       return
 
-    players = Player.query().order(Player.name).fetch(100)
+    players = Player.query().order(Player.name).fetch(1000)
     playing = [p for p in players if p.key in game.players]
     not_playing = [p for p in players if p.key not in game.players]
 
