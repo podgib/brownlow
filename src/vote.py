@@ -23,6 +23,8 @@ class VoteHandler(webapp2.RequestHandler):
   def get(self, token_string):
     token = Token.query(Token.value == token_string).get()
     if not token:
+      token = Token.query(Token.value == token_string + '==').get()
+    if not token:
       template = jinja_environment.get_template("templates/error.html")
       self.response.out.write(template.render({'errmsg': "invalid voting token"}))
       return

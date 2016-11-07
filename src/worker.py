@@ -68,7 +68,7 @@ class EmailHandler(webapp2.RequestHandler):
 
     if not token:
       logging.info("No token found for %s. Creating new token.", player.name)
-      token_string = base64.urlsafe_b64encode(os.urandom(16))
+      token_string = base64.urlsafe_b64encode(os.urandom(16))[:-2]
       token = Token(value=token_string, voter=player.key, game=game.key, used=False)
       token.put()
     else:
