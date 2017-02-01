@@ -23,6 +23,36 @@ def cache_results(results):
   if GameResults.query(ancestor=results.game).count() == 0:
     results.put()
 
+def full_game_results(game):
+  votes = Vote.query(Vote.game == game.key).fetch(1000)
+  player_votes = {}
+
+  for vote in votes:
+    p = vote.three
+    if player_votes.has_key(p):
+      player_votes[p].threes += 1
+    else:
+      player_votes[p] = PlayerGameVotes(game=game.key, player=p, threes=1)
+
+    p = vote.two
+    if player_votes.has_key(p):
+      player_votes[p].twos += 1
+    else:
+      player_votes[p] = PlayerGameVotes(game=game.key, player=p, twos=1)
+
+    p = vote.one
+    if player_votes.has_key(p):
+      player_votes[p].ones += 1
+    else:
+      player_votes[p] = PlayerGameVotes(game=game.key, player=p, ones=1)
+
+  if len(player_votes) < 3:
+    return None
+
+  sorted_votes = sorted(player_votes.items(), key=lambda p: -p[1].ranking_points())
+  votes = [(p[0].get().name, p[1].total()) for p in sorted_votes]
+  return votes
+
 def game_results(game):
   cached_results = GameResults.query(ancestor=game.key).get()
   if cached_results:
@@ -60,7 +90,6 @@ def game_results(game):
   result = GameResults(parent=game.key, game=game.key, three=players[0], two=players[1], one=players[2], voters=len(votes))
 
   cache_results(result)
-
   return result
 
 class OverallResults:

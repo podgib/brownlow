@@ -17,7 +17,7 @@ from models.token import Token
 from models.vote import Vote, SelfVote
 from models.season import Season
 
-from results import game_results, overall_results, OverallResults
+from results import game_results, full_game_results, overall_results, OverallResults
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 jinja_environment.filters['teamString'] = Team.getString
@@ -330,7 +330,7 @@ class ResultsHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template("templates/results.html")
     self.response.out.write(template.render(params))
 
-class VotersHandler(webapp2.RequestHandler):
+class GameResultsHandler(webapp2.RequestHandler):
   def get(self, game_id):
     game = Game.get_by_id(int(game_id))
     if not game:
@@ -338,11 +338,19 @@ class VotersHandler(webapp2.RequestHandler):
       logging.error("Invalid game ID: " + str(game_id))
       return
 
+    user_email = users.get_current_user().email()
+    authorised = True
+    if game.team == Team.MEN:
+      authorised = user_email in mens_results_viewers
+    if game.team == Team.WOMEN:
+      authorised = user_email in womens_results_viewers
+
+    votes = full_game_results(game)
     voters = Token.query(ndb.AND(Token.game == game.key, Token.used == True)).fetch(100)
     non_voters = Token.query(ndb.AND(Token.game == game.key, Token.used == False)).fetch(100)
 
-    template = jinja_environment.get_template('templates/voters.html')
-    params = {'voters':voters,'non_voters':non_voters,'game':game}
+    template = jinja_environment.get_template('templates/game_results.html')
+    params = {'votes':votes,'voters':voters,'non_voters':non_voters,'game':game,'authorised':authorised}
     self.response.out.write(template.render(params))
 
 class PublicResultsHandler(webapp2.RequestHandler):
@@ -396,6 +404,6 @@ app = webapp2.WSGIApplication([
   ('/admin/results', ResultsMenuHandler),
   ('/admin/results/public', PublicResultsHandler),
   webapp2.Route('/admin/results/<team_name>', handler=ResultsHandler),
-  webapp2.Route('/admin/voters/<game_id>', handler=VotersHandler),
+  webapp2.Route('/admin/game_results/<game_id>', handler=GameResultsHandler),
   ('/admin',MenuHandler), ('/admin/', MenuHandler)
 ], debug=True)

@@ -21,6 +21,9 @@ class PlayerGameVotes(ndb.Model):
     return 3 * self.threes + 2 * self.twos + self.ones \
            + self.threes / 1000.0 + self.twos / 1000000.0
 
+  def total(self):
+    return 3 * self.threes + 2 * self.twos + self.ones
+
 class PlayerOverallVotes(ndb.Model):
   player = ndb.KeyProperty(kind=Player, required=True)
   threes = ndb.IntegerProperty(default=0)

@@ -4,22 +4,35 @@
 <h1>Oxford vs {{ game.opponent }} ({{ game.team|teamString }})</h1>
 <h2>{{ game.venue }}, {{ game.date }}</h2>
 
+{% if authorised %}
+<div class="game-results">
+<h2>Full Results</h2>
+{% for player in votes %}
+<p class="game-results">{{ loop.index }}. {{ player[0] }}: {{ player[1] }}</p>
+{% endfor %}
+</div>
+{% endif %}
+
 {% if voters %}
-<h3>Voted</h3>
+<div class="game-results">
+<h2>Voted</h2>
 <ul>
     {%- for v in voters -%}
     <li>{{ v.voter.get().name }}</li>
     {%- endfor  -%}
 </ul>
+</div>
 {% endif %}
 
 {% if non_voters %}
-    <h3>Yet To Vote</h3>
+    <div class="game-results">
+    <h2>Yet To Vote</h2>
     <ul>
         {%- for v in non_voters -%}
             <li>{{ v.voter.get().name }}</li>
         {%- endfor  -%}
     </ul>
+    </div>
 {% endif %}
 
 {% endblock content %}

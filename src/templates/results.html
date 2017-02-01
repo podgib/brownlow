@@ -20,7 +20,7 @@
 
 {% for gr in results.game_votes %}
 {% set game = gr.game.get() %}
-{% if not hide_count %}<a href="/admin/voters/{{ game.key.id() }}">{% endif %}
+{% if not hide_count %}<a href="/admin/game_results/{{ game.key.id() }}">{% endif %}
 <div class="game-results">
 <h2 class="results">Game {{loop.index}}</h2>
 <h3 class="results">Oxford vs {{game.opponent}}</h3>
